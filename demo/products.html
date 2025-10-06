@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - TechGear Shop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="container nav-container">
+                <a href="index.html" class="logo">TechGear</a>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="cart.html" class="cart-icon">
+                        Cart
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="products-header">
+            <h1>Our Products</h1>
+            <div class="filters">
+                <select id="category-filter">
+                    <option value="all">All Categories</option>
+                    <option value="audio">Audio</option>
+                    <option value="wearables">Wearables</option>
+                    <option value="accessories">Accessories</option>
+                </select>
+                <select id="sort-filter">
+                    <option value="default">Sort by: Featured</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name">Name: A to Z</option>
+                </select>
+            </div>
+        </section>
+
+        <div id="products-grid" class="products-grid">
+            <!-- Products will be dynamically loaded here -->
+        </div>
+    </main>
+
+    <!-- Import Activity Tracker and Cart Management -->
+    <script src="../activity-tracker.js"></script>
+    <script src="cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tracker = new ActivityTracker();
+            loadProducts();
+            setupFilters();
+        });
+
+        const products = [
+            {
+                id: 'p1',
+                name: 'Premium Wireless Headphones',
+                price: 199.99,
+                category: 'audio',
+                image: 'https://prd.place/408',
+                description: 'High-quality wireless headphones with noise cancellation.'
+            },
+            {
+                id: 'p2',
+                name: 'Smart Fitness Watch',
+                price: 149.99,
+                category: 'wearables',
+                image: 'https://prd.place/409',
+                description: 'Track your fitness goals with this advanced smartwatch.'
+            },
+            {
+                id: 'p3',
+                name: 'Portable Bluetooth Speaker',
+                price: 79.99,
+                category: 'audio',
+                image: 'https://prd.place/410',
+                description: 'Powerful and portable speaker for your outdoor adventures.'
+            },
+            {
+                id: 'p4',
+                name: 'True Wireless Earbuds',
+                price: 129.99,
+                category: 'audio',
+                image: 'https://prd.place/411',
+                description: 'Compact and comfortable wireless earbuds for everyday use.'
+            },
+            {
+                id: 'p5',
+                name: '20000mAh Power Bank',
+                price: 49.99,
+                category: 'accessories',
+                image: 'https://prd.place/412',
+                description: 'High-capacity power bank for all your charging needs.'
+            },
+            {
+                id: 'p6',
+                name: 'Fast Wireless Charger',
+                price: 39.99,
+                category: 'accessories',
+                image: 'https://via.placeholder.com/300',
+                description: 'Qi-compatible wireless charger for quick and easy charging.'
+            }
+        ];
+
+        function loadProducts(filteredProducts = products) {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+
+            filteredProducts.forEach(product => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-price">$${product.price.toFixed(2)}</p>
+                        <p class="product-category">${product.category}</p>
+                        <div class="product-actions">
+                            <a href="product1.html" class="btn btn-secondary">View Details</a>
+                            <button onclick="addToCart(${JSON.stringify(product)})" class="btn btn-primary">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function setupFilters() {
+            const categoryFilter = document.getElementById('category-filter');
+            const sortFilter = document.getElementById('sort-filter');
+
+            function applyFilters() {
+                let filtered = [...products];
+
+                // Apply category filter
+                if (categoryFilter.value !== 'all') {
+                    filtered = filtered.filter(
+                        product => product.category === categoryFilter.value
+                    );
+                }
+
+                // Apply sort filter
+                switch (sortFilter.value) {
+                    case 'price-low':
+                        filtered.sort((a, b) => a.price - b.price);
+                        break;
+                    case 'price-high':
+                        filtered.sort((a, b) => b.price - a.price);
+                        break;
+                    case 'name':
+                        filtered.sort((a, b) => a.name.localeCompare(b.name));
+                        break;
+                }
+
+                loadProducts(filtered);
+            }
+
+            categoryFilter.addEventListener('change', applyFilters);
+            sortFilter.addEventListener('change', applyFilters);
+        }
+
+        function addToCart(product) {
+            cart.addToCart(product);
+            showNotification(`${product.name} added to cart!`);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

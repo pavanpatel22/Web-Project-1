@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechGear Shop - Activity Tracker Demo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="container nav-container">
+                <a href="index.html" class="logo">TechGear</a>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="cart.html" class="cart-icon">
+                        Cart
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Welcome to TechGear</h1>
+            <p>Discover amazing tech products at unbeatable prices</p>
+            <a href="products.html" class="btn btn-primary">Shop Now</a>
+        </div>
+    </section>
+
+    <main class="container">
+        <section class="featured-products">
+            <h2>Featured Products</h2>
+            <div class="products-grid">
+                <div class="product-card">
+                    <img src="https://prd.place/400" alt="Wireless Headphones" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Premium Wireless Headphones</h3>
+                        <p class="product-price">$199.99</p>
+                        <a href="product1.html" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://prd.place/401" alt="Smartwatch" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Smart Fitness Watch</h3>
+                        <p class="product-price">$149.99</p>
+                        <a href="product1.html" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+                <div class="product-card">
+                    <img src="https://prd.place/402" alt="Wireless Speaker" class="product-image">
+                    <div class="product-info">
+                        <h3 class="product-title">Portable Bluetooth Speaker</h3>
+                        <p class="product-price">$79.99</p>
+                        <a href="product1.html" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Import Activity Tracker and Cart Management -->
+    <script src="../activity-tracker.js"></script>
+    <script src="cart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tracker = new ActivityTracker();
+        });
+    </script>
+</body>
+</html>

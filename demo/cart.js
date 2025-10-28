@@ -11,13 +11,17 @@ class ShoppingCart {
             existingItem.quantity += 1;
         } else {
             this.cart.push({
-                ...product,
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                image: product.image,
                 quantity: 1
             });
         }
         
         this.saveCart();
         this.updateCartCount();
+        return this.cart.length;
     }
 
     removeFromCart(productId) {
@@ -32,10 +36,11 @@ class ShoppingCart {
             item.quantity = parseInt(quantity);
             if (item.quantity <= 0) {
                 this.removeFromCart(productId);
+            } else {
+                this.saveCart();
+                this.updateCartCount();
             }
         }
-        this.saveCart();
-        this.updateCartCount();
     }
 
     getTotal() {
@@ -57,10 +62,12 @@ class ShoppingCart {
     }
 
     updateCartCount() {
-        const cartCount = document.querySelector('.cart-count');
-        if (cartCount) {
+        const cartCountElements = document.querySelectorAll('.cart-count');
+        if (cartCountElements.length > 0) {
             const totalItems = this.cart.reduce((total, item) => total + item.quantity, 0);
-            cartCount.textContent = totalItems;
+            cartCountElements.forEach(element => {
+                element.textContent = totalItems;
+            });
         }
     }
 }

@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - TechGear Shop</title>
     <link rel="stylesheet" href="../activity-tracker.css">
-    <link rel="stylesheet" href="styles.css">
     <style>
         /* Activity Tracker Icon Styles */
         .activity-tracker-icon {
@@ -277,7 +276,6 @@
 </head>
 <body>
 
-
     <!-- Loading Bar -->
     <div class="loading-bar" id="loadingBar"></div>
 
@@ -358,8 +356,6 @@
                 activityTrackerIcon.addEventListener('click', () => {
                     // This will trigger the activity tracker panel to open
                     console.log('Activity tracker icon clicked');
-                    // If the activity tracker doesn't open automatically, you might need to manually trigger it
-                    // window.activityTracker.showPanel();
                 });
             }
             
@@ -384,34 +380,52 @@
             
             tbody.innerHTML = '';
             
-            cartItems.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
-                            <span>${item.name}</span>
-                        </div>
-                    </td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>
-                        <input type="number" value="${item.quantity}" min="1" 
-                            onchange="updateQuantity('${item.id}', this.value)">
-                    </td>
-                    <td>$${(item.price * item.quantity).toFixed(2)}</td>
-                    <td>
-                        <button class="btn btn-secondary" onclick="removeItem('${item.id}')">Remove</button>
-                    </td>
+            if (cartItems.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem;">
+                            <i class="fas fa-shopping-cart" style="font-size: 3rem; color: #9ca3af; margin-bottom: 1rem;"></i>
+                            <h3 style="color: #6b7280; margin-bottom: 0.5rem;">Your cart is empty</h3>
+                            <p style="color: #9ca3af;">Add some products to your cart to see them here.</p>
+                            <a href="products.html" class="btn btn-primary" style="margin-top: 1rem;">
+                                <i class="fas fa-shopping-bag"></i> Browse Products
+                            </a>
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(tr);
-            });
+            } else {
+                cartItems.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
+                                <span>${item.name}</span>
+                            </div>
+                        </td>
+                        <td>$${item.price.toFixed(2)}</td>
+                        <td>
+                            <input type="number" value="${item.quantity}" min="1" 
+                                onchange="updateQuantity('${item.id}', this.value)">
+                        </td>
+                        <td>$${(item.price * item.quantity).toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-secondary" onclick="removeItem('${item.id}')">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
             
             const totalAmount = cart.getTotal();
             total.textContent = totalAmount.toFixed(2);
             
             // Update cart count in header
             if (cartCount) {
-                cartCount.textContent = cartItems.length;
+                const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
+                cartCount.textContent = totalItems;
             }
         }
 

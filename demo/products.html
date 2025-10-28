@@ -677,8 +677,6 @@
     <!-- Loading Bar -->
     <div class="loading-bar" id="loadingBar"></div>
 
-    
-
     <!-- Header -->
     <header class="header">
         <div class="container nav-container">
@@ -790,6 +788,7 @@
     </footer>
 
     <script src="../activity-tracker.js"></script>
+    <script src="cart.js"></script>
     
     <!-- Enhanced JavaScript -->
     <script>
@@ -800,10 +799,7 @@
             if (activityTrackerIcon) {
                 activityTrackerIcon.addEventListener('click', () => {
                     // This will trigger the activity tracker panel to open
-                    // The activity-tracker.js should handle this
                     console.log('Activity tracker icon clicked');
-                    // If the activity tracker doesn't open automatically, you might need to manually trigger it
-                    // window.activityTracker.showPanel();
                 });
             }
             
@@ -912,20 +908,22 @@
             }
         ];
 
-        // Cart simulation
-        let cart = {
-            items: [],
-            addToCart: function(product) {
-                this.items.push(product);
-                updateCartCount();
-                return this.items.length;
-            },
-            getCount: function() {
-                return this.items.length;
-            }
-        };
+        // Use ShoppingCart class for cart functionality
+        function addToCart(product) {
+            cart.addToCart(product);
+            updateCartCount();
+            showNotification(`${product.name} added to cart!`);
+        }
 
-        // Wishlist simulation
+        function updateCartCount() {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                const totalItems = cart.getCart().reduce((total, item) => total + item.quantity, 0);
+                cartCount.textContent = totalItems;
+            }
+        }
+
+        // Wishlist simulation (local only)
         let wishlist = [];
 
         function loadProducts(filteredProducts = products) {
@@ -1111,11 +1109,6 @@
             });
         }
 
-        function addToCart(product) {
-            cart.addToCart(product);
-            showNotification(`${product.name} added to cart!`);
-        }
-
         function toggleWishlist(productId) {
             const index = wishlist.indexOf(productId);
             if (index === -1) {
@@ -1137,13 +1130,6 @@
             const product = products.find(p => p.id === productId);
             if (product) {
                 showNotification(`Quick view: ${product.name}`);
-            }
-        }
-
-        function updateCartCount() {
-            const cartCount = document.querySelector('.cart-count');
-            if (cartCount) {
-                cartCount.textContent = cart.getCount();
             }
         }
 

@@ -4,41 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products - TechGear Shop</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="products.css">
+    <!-- Modern Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <nav>
-            <div class="container nav-container">
-                <a href="index.html" class="logo">TechGear</a>
-                <div class="nav-links">
-                    <a href="index.html">Home</a>
-                    <a href="products.html">Products</a>
-                    <a href="cart.html" class="cart-icon">
-                        Cart
-                        <span class="cart-count">0</span>
-                    </a>
-                </div>
+    <!-- Loading Bar -->
+    <div class="loading-bar" id="loadingBar"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">TechGear</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html" class="active">Products</a>
+                <a href="cart.html" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    Cart
+                    <span class="cart-count">0</span>
+                </a>
             </div>
-        </nav>
+        </div>
     </header>
 
     <main class="container">
         <section class="products-header">
-            <h1>Our Products</h1>
+            <h1>Discover Our Tech Collection</h1>
+            <p>Explore cutting-edge technology designed to enhance your digital lifestyle</p>
+            
+            <!-- Search Bar -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" class="search-input" placeholder="Search products...">
+            </div>
+
+            <!-- Filter Tags -->
+            <div class="filter-tags">
+                <div class="filter-tag active" data-category="all">
+                    <i class="fas fa-th-large"></i> All Products
+                </div>
+                <div class="filter-tag" data-category="audio">
+                    <i class="fas fa-headphones"></i> Audio
+                </div>
+                <div class="filter-tag" data-category="wearables">
+                    <i class="fas fa-watch"></i> Wearables
+                </div>
+                <div class="filter-tag" data-category="accessories">
+                    <i class="fas fa-bolt"></i> Accessories
+                </div>
+            </div>
+
             <div class="filters">
-                <select id="category-filter">
-                    <option value="all">All Categories</option>
-                    <option value="audio">Audio</option>
-                    <option value="wearables">Wearables</option>
-                    <option value="accessories">Accessories</option>
-                </select>
-                <select id="sort-filter">
-                    <option value="default">Sort by: Featured</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="name">Name: A to Z</option>
-                </select>
+                <div class="filter-group">
+                    <label for="category-filter">Category</label>
+                    <select id="category-filter">
+                        <option value="all">All Categories</option>
+                        <option value="audio">Audio</option>
+                        <option value="wearables">Wearables</option>
+                        <option value="accessories">Accessories</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="sort-filter">Sort By</label>
+                    <select id="sort-filter">
+                        <option value="default">Featured</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                        <option value="name">Name: A to Z</option>
+                    </select>
+                </div>
             </div>
         </section>
 
@@ -47,90 +86,245 @@
         </div>
     </main>
 
-    <!-- Import Activity Tracker and Cart Management -->
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>TechGear</h3>
+                    <p>Premium technology products designed for the modern lifestyle. Quality, innovation, and performance.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="#">About Us</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="footer-section">
+                    <h3>Connect With Us</h3>
+                    <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+                    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
+                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+                    <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 TechGear. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="../activity-tracker.js"></script>
-    <script src="cart.js"></script>
+    
+    <!-- Enhanced JavaScript -->
     <script>
+        // Initialize Activity Tracker
         document.addEventListener('DOMContentLoaded', () => {
             const tracker = new ActivityTracker();
             loadProducts();
             setupFilters();
+            setupSearch();
+            setupFilterTags();
+            updateCartCount();
+            
+            // Loading bar animation
+            const loadingBar = document.getElementById('loadingBar');
+            loadingBar.style.width = '100%';
+            setTimeout(() => {
+                loadingBar.style.opacity = '0';
+                setTimeout(() => loadingBar.remove(), 300);
+            }, 500);
         });
 
+        // Products data
         const products = [
             {
                 id: 'p1',
                 name: 'Premium Wireless Headphones',
                 price: 199.99,
+                originalPrice: 249.99,
                 category: 'audio',
-                image: 'https://prd.place/408',
-                description: 'High-quality wireless headphones with noise cancellation.'
+                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                description: 'High-quality wireless headphones with active noise cancellation and premium sound quality.',
+                rating: 4.8,
+                reviewCount: 1247,
+                badge: 'Bestseller'
             },
             {
                 id: 'p2',
                 name: 'Smart Fitness Watch',
                 price: 149.99,
+                originalPrice: 199.99,
                 category: 'wearables',
-                image: 'https://prd.place/409',
-                description: 'Track your fitness goals with this advanced smartwatch.'
+                image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                description: 'Track your fitness goals with this advanced smartwatch featuring heart rate monitoring and GPS.',
+                rating: 4.6,
+                reviewCount: 892,
+                badge: 'Popular'
             },
             {
                 id: 'p3',
                 name: 'Portable Bluetooth Speaker',
                 price: 79.99,
                 category: 'audio',
-                image: 'https://prd.place/410',
-                description: 'Powerful and portable speaker for your outdoor adventures.'
+                image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                description: 'Powerful and portable speaker with 360° sound for your outdoor adventures and parties.',
+                rating: 4.4,
+                reviewCount: 567,
+                badge: 'New'
             },
             {
                 id: 'p4',
                 name: 'True Wireless Earbuds',
                 price: 129.99,
                 category: 'audio',
-                image: 'https://prd.place/411',
-                description: 'Compact and comfortable wireless earbuds for everyday use.'
+                image: 'https://images.unsplash.com/photo-1590658165737-15a047b8b5e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                description: 'Compact and comfortable wireless earbuds with crystal clear audio and long battery life.',
+                rating: 4.7,
+                reviewCount: 1034,
+                badge: 'Trending'
             },
             {
                 id: 'p5',
                 name: '20000mAh Power Bank',
                 price: 49.99,
                 category: 'accessories',
-                image: 'https://prd.place/412',
-                description: 'High-capacity power bank for all your charging needs.'
+                image: 'https://images.unsplash.com/photo-1609592810795-13b00c18b1a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                description: 'High-capacity power bank with fast charging technology for all your devices.',
+                rating: 4.3,
+                reviewCount: 445,
+                badge: 'Essential'
             },
             {
                 id: 'p6',
                 name: 'Fast Wireless Charger',
                 price: 39.99,
+                originalPrice: 59.99,
                 category: 'accessories',
-                image: 'https://via.placeholder.com/300',
-                description: 'Qi-compatible wireless charger for quick and easy charging.'
+                image: 'https://images.unsplash.com/photo-1609592810795-13b00c18b1a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+                description: 'Qi-compatible wireless charger with fast charging capability for all compatible devices.',
+                rating: 4.2,
+                reviewCount: 321,
+                badge: 'Sale'
             }
         ];
 
+        // Cart simulation
+        let cart = {
+            items: [],
+            addToCart: function(product) {
+                this.items.push(product);
+                updateCartCount();
+                return this.items.length;
+            },
+            getCount: function() {
+                return this.items.length;
+            }
+        };
+
+        // Wishlist simulation
+        let wishlist = [];
+
         function loadProducts(filteredProducts = products) {
             const grid = document.getElementById('products-grid');
+            
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No products found</h3>
+                        <p>Try adjusting your filters or search terms</p>
+                    </div>
+                `;
+                return;
+            }
+            
             grid.innerHTML = '';
 
-            filteredProducts.forEach(product => {
+            filteredProducts.forEach((product, index) => {
                 const card = document.createElement('div');
-                card.className = 'product-card';
+                card.className = 'product-card animate-fade-in';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const discount = product.originalPrice ? 
+                    Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
+                
+                const stars = generateStarRating(product.rating);
+                
                 card.innerHTML = `
-                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-image-container">
+                        <img src="${product.image}" alt="${product.name}" class="product-image">
+                        ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
+                        <button class="wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}" 
+                                onclick="toggleWishlist('${product.id}')">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <div class="quick-view">
+                            <button class="quick-view-btn" onclick="quickView('${product.id}')">
+                                <i class="fas fa-eye"></i> Quick View
+                            </button>
+                        </div>
+                    </div>
                     <div class="product-info">
                         <h3 class="product-title">${product.name}</h3>
-                        <p class="product-price">$${product.price.toFixed(2)}</p>
-                        <p class="product-category">${product.category}</p>
+                        <p class="product-description">${product.description}</p>
+                        
+                        <div class="product-price-container">
+                            <span class="product-price">$${product.price.toFixed(2)}</span>
+                            ${product.originalPrice ? `
+                                <span class="original-price">$${product.originalPrice.toFixed(2)}</span>
+                                <span class="discount">-${discount}%</span>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="product-meta">
+                            <span class="product-category">${product.category}</span>
+                            <div class="rating">
+                                <div class="rating-stars">
+                                    ${stars}
+                                </div>
+                                <span class="rating-count">(${product.reviewCount})</span>
+                            </div>
+                        </div>
+                        
                         <div class="product-actions">
-                            <a href="product1.html" class="btn btn-secondary">View Details</a>
-                            <button onclick="addToCart(${JSON.stringify(product)})" class="btn btn-primary">
-                                Add to Cart
+                            <a href="product-details.html?id=${product.id}" class="btn btn-secondary">
+                                <i class="fas fa-eye"></i> Details
+                            </a>
+                            <button class="btn btn-primary" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
+                                <i class="fas fa-cart-plus"></i> Add to Cart
                             </button>
                         </div>
                     </div>
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        function generateStarRating(rating) {
+            const fullStars = Math.floor(rating);
+            const halfStar = rating % 1 >= 0.5;
+            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+            
+            let stars = '';
+            
+            // Full stars
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            
+            // Half star
+            if (halfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            // Empty stars
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
         }
 
         function setupFilters() {
@@ -167,15 +361,100 @@
             sortFilter.addEventListener('change', applyFilters);
         }
 
+        function setupFilterTags() {
+            const filterTags = document.querySelectorAll('.filter-tag');
+            const categoryFilter = document.getElementById('category-filter');
+            
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    // Remove active class from all tags
+                    filterTags.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tag
+                    tag.classList.add('active');
+                    
+                    // Update category filter
+                    const category = tag.dataset.category;
+                    categoryFilter.value = category;
+                    
+                    // Apply filters
+                    let filtered = [...products];
+                    
+                    if (category !== 'all') {
+                        filtered = filtered.filter(product => product.category === category);
+                    }
+                    
+                    loadProducts(filtered);
+                });
+            });
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('search-input');
+            
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                
+                if (searchTerm.length === 0) {
+                    loadProducts(products);
+                    return;
+                }
+                
+                const filtered = products.filter(product => 
+                    product.name.toLowerCase().includes(searchTerm) || 
+                    product.description.toLowerCase().includes(searchTerm) ||
+                    product.category.toLowerCase().includes(searchTerm)
+                );
+                
+                loadProducts(filtered);
+            });
+        }
+
         function addToCart(product) {
             cart.addToCart(product);
             showNotification(`${product.name} added to cart!`);
+            
+            // Track this as an interaction in the activity tracker
+            if (window.tracker && window.tracker.trackInteraction) {
+                window.tracker.trackInteraction(`Added to cart: ${product.name}`);
+            }
+        }
+
+        function toggleWishlist(productId) {
+            const index = wishlist.indexOf(productId);
+            if (index === -1) {
+                wishlist.push(productId);
+                showNotification('Product added to wishlist!');
+            } else {
+                wishlist.splice(index, 1);
+                showNotification('Product removed from wishlist!');
+            }
+            
+            // Update UI
+            const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="toggleWishlist('${productId}')"]`);
+            if (wishlistBtn) {
+                wishlistBtn.classList.toggle('active');
+            }
+        }
+
+        function quickView(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                showNotification(`Quick view: ${product.name}`);
+                // In a real app, you would open a modal with product details
+            }
+        }
+
+        function updateCartCount() {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = cart.getCount();
+            }
         }
 
         function showNotification(message) {
             const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
+            notification.className = 'notification animate-slide-in';
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
             document.body.appendChild(notification);
 
             setTimeout(() => {

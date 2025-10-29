@@ -9,7 +9,7 @@ class ActivityTracker {
             totalClicks: 0,
             formsSubmitted: 0
         };
-        
+
         this.init();
     }
 
@@ -31,7 +31,7 @@ class ActivityTracker {
             try {
                 const data = JSON.parse(stored);
 
-                const lastActivity = (data.events && data.events.length > 0) ? 
+                const lastActivity = (data.events && data.events.length > 0) ?
                     Math.max(...data.events.map(e => e.time)) : data.sessionStart || 0;
                 const timeSinceLastActivity = Date.now() - lastActivity;
 
@@ -91,94 +91,136 @@ class ActivityTracker {
     }
 
     setupEventListeners() {
-        // Single delegated click listener high on the document
-        document.addEventListener('click', (e) => {
-            // If timeline button clicked, toggle timeline (and *do not* treat as .btn-primary)
-            const timelineBtn = e.target.closest('.activity-tracker-button');
-            if (timelineBtn) {
-                this.toggleTimeline();
-                return;
+    // Click tracking
+    document.addEventListener('click', (e) => {
+        const timelineBtn = e.target.closest('.activity-tracker-button'); 
+        if (timelineBtn) { this.toggleTimeline(); return; }
+
+        const primary = e.target.closest('.btn-primary'); 
+        if (primary) { this.trackButtonClick(); return; }
+    });
+
+    // Form submission tracking
+    document.addEventListener('submit', (e) => {
+        this.trackFormSubmission({ formName: (e.target.name || e.target.id) || 'form' });
+    });
+
+    // Scroll tracking (debounced)
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => this.updateScrollDepth(), 100);
+    });
+
+    // Final scroll update on page unload
+    window.addEventListener('beforeunload', () => this.updateScrollDepth(true));
+}
+
+
+    /*setupEventListeners() {
+    // 1️⃣ Single delegated click listener high on the document
+    document.addEventListener('click', (e) => {
+        // Timeline panel button clicked? Toggle timeline and skip tracking
+        const timelineBtn = e.target.closest('.activity-tracker-button');
+        if (timelineBtn) {
+            this.toggleTimeline();
+            return;
+        }
+
+        // 2️⃣ Track any clickable element
+        const target = e.target.closest(
+            'button, a, select, [onclick], .filter-tag, .btn, .cta, .card, [role="button"]'
+        );
+
+        if (target) {
+            // Get a readable label
+            let label = target.textContent.trim() || 
+                        target.getAttribute('aria-label') || 
+                        target.getAttribute('id') || 
+                        'Unknown Clickable';
+
+            // Special case: filter tags
+            if (target.classList.contains('filter-tag')) {
+                label = `Filter tag clicked: ${label}`;
             }
 
-            // Check for .btn-primary clicks (delegated)
-            const primary = e.target.closest('.btn-primary');
-            if (primary) {
-                this.trackButtonClick();
-                return;
-            }
-        });
+            this.trackButtonClick(label);
+        }
+    });
 
-        // Track form submissions: submit event does bubble, so one listener is enough
-        document.addEventListener('submit', (e) => {
-            // Do not prevent default (so normal form submission/navigation proceeds)
-            this.trackFormSubmission({
-                formName: (e.target && (e.target.name || e.target.id)) || 'form'
-            });
-        });
+    // 3️⃣ Capture dropdown changes (select elements)
+    document.addEventListener('change', (e) => {
+        const target = e.target.closest('select');
+        if (target) {
+            const label = target.previousElementSibling?.textContent.trim() || target.id || 'Dropdown';
+            const selectedOption = target.options[target.selectedIndex].textContent.trim();
+            this.trackButtonClick(`${label} changed to: ${selectedOption}`);
+        }
+    });
 
-        // Track scroll for page view updates (debounced)
-        let scrollTimeout;
-        window.addEventListener('scroll', () => {
-            clearTimeout(scrollTimeout);
-            scrollTimeout = setTimeout(() => {
-                this.updateScrollDepth();
-            }, 100);
+    // 4️⃣ Track form submissions
+    document.addEventListener('submit', (e) => {
+        this.trackFormSubmission({
+            formName: (e.target && (e.target.name || e.target.id)) || 'form'
         });
-    }
+    });
+
+    // 5️⃣ Track scroll for page view updates (debounced)
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            this.updateScrollDepth();
+        }, 100);
+    });
+}*/
+
+
 
     trackPageView() {
         const pageName = document.title || window.location.pathname.split('/').pop() || 'index.html';
         const scrollDepth = this.calculateScrollDepth();
-        
-        // Check if we already have a page view for this page in current session
-        const existingPageView = this.events.find(event => 
-            event.type === 'pageview' && event.page === pageName
-        );
 
-        if (!existingPageView) {
-            const ev = {
-                type: 'pageview',
-                page: pageName,
-                time: Date.now(),
-                scrollDepth: scrollDepth
-            };
-            this.events.push(ev);
-            this.stats.pagesViewed++;
-            this.saveToStorage();
-            this.render();
-        } else {
-            // Update scroll depth for existing page view if deeper
-            if (existingPageView.scrollDepth < scrollDepth) {
-                existingPageView.scrollDepth = scrollDepth;
-                this.saveToStorage();
-                this.render();
-            }
-        }
+        const ev = {
+            type: 'pageview',
+            page: pageName,
+            time: Date.now(),
+            scrollDepth: scrollDepth
+        };
+        this.events.push(ev);
+        this.stats.pagesViewed++;
+        this.saveToStorage();
+        this.render();
     }
 
-    updateScrollDepth() {
-        const pageName = document.title || window.location.pathname.split('/').pop() || 'index.html';
-        const scrollDepth = this.calculateScrollDepth();
-        
-        const pageView = this.events.find(event => 
-            event.type === 'pageview' && event.page === pageName
-        );
-        
-        if (pageView && pageView.scrollDepth < scrollDepth) {
-            pageView.scrollDepth = scrollDepth;
-            this.saveToStorage();
-            this.render();
-        }
-    }
 
-    trackButtonClick() {
+    updateScrollDepth(force = false) {
+    const pageName = document.title || window.location.pathname.split('/').pop() || 'index.html';
+    const scrollDepth = this.calculateScrollDepth();
+
+    const pageView = this.events.find(event =>
+        event.type === 'pageview' && event.page === pageName
+    );
+
+    if (!pageView) return;
+
+    // Only update if new depth is higher, or if forced (unload)
+    if (force || scrollDepth > pageView.scrollDepth) {
+        pageView.scrollDepth = scrollDepth;
+        this.saveToStorage();
+        this.render();
+    }
+}
+
+
+    trackButtonClick(label = 'Unknown Clickable') {
         this.events.push({
             type: 'interaction',
             subtype: 'button-click',
-            details: 'Clicked link: Shop Now',
+            details: label,   // store the actual clicked element's label
             time: Date.now()
         });
-        
+
         this.stats.totalClicks++;
         this.saveToStorage();
         this.render();
@@ -192,22 +234,29 @@ class ActivityTracker {
             details: details,
             time: Date.now()
         });
-        
+
         this.stats.formsSubmitted++;
         this.saveToStorage();
         this.render();
     }
 
     calculateScrollDepth() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop || 0;
-        const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-        const clientHeight = document.documentElement.clientHeight || window.innerHeight || 0;
-        
-        if (scrollHeight <= clientHeight || clientHeight === 0) return 100;
-        
-        const scrollPercentage = Math.round((scrollTop / (scrollHeight - clientHeight)) * 100);
-        return Math.min(Math.max(scrollPercentage, 0), 100);
-    }
+    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+    const scrollHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight,
+        document.body.offsetHeight,
+        document.documentElement.offsetHeight
+    );
+    const clientHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+
+    if (scrollHeight <= clientHeight) return 100; // fully visible
+
+    const scrollPercent = (scrollTop / (scrollHeight - clientHeight)) * 100;
+
+    return Math.min(Math.max(scrollPercent, 0), 100); // clamp between 0 and 100
+}
+
 
     formatTime(timestamp) {
         const date = new Date(timestamp);
@@ -280,7 +329,7 @@ class ActivityTracker {
             header.className = 'timeline-header';
             timeline.appendChild(header);
         }
-        
+
         if (!header.querySelector('h3')) {
             header.innerHTML = `
                 <h3>Activity Timeline</h3>
@@ -325,11 +374,11 @@ class ActivityTracker {
     renderHeader() {
         const sessionIdEl = document.querySelector('.session-id');
         const sessionStartedEl = document.querySelector('.session-started');
-        
+
         if (sessionIdEl) {
             sessionIdEl.textContent = `Session ID: ${this.sessionId}`;
         }
-        
+
         if (sessionStartedEl) {
             sessionStartedEl.textContent = `Started: ${this.formatTime(this.sessionStart)}`;
         }
@@ -366,10 +415,10 @@ class ActivityTracker {
 
         // Sort events by time (newest first)
         const sortedEvents = [...this.events].sort((a, b) => b.time - a.time);
-        
+
         timelineWrapper.innerHTML = sortedEvents.map(event => {
             const time = this.formatTime(event.time);
-            
+
             if (event.type === 'pageview') {
                 return `
                     <div class="timeline-item pageview">

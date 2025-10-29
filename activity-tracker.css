@@ -55,6 +55,7 @@
     max-height: 70vh;
     display: flex;
     flex-direction: column;
+    z-index: 10000;
 }
 
 .activity-tracker-timeline.expanded {

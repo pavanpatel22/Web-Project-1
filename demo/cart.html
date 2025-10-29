@@ -1,44 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart - TechGear Shop</title>
+
+    <!-- External CSS -->
     <link rel="stylesheet" href="../activity-tracker.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
     <style>
-        /* Activity Tracker Icon Styles */
-        .activity-tracker-icon {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            border: none;
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #f59e0b;
+            --gray-light: #f8fafc;
+            --gray-dark: #374151;
+            --gray-mid: #6b7280;
         }
 
-        .activity-tracker-icon:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            background: #f9fafb;
         }
 
-        /* Cart specific styles */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
+        /* Header & Navbar */
         header {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
@@ -49,6 +38,12 @@
             right: 0;
             z-index: 1000;
             padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
         }
 
         .nav-container {
@@ -63,8 +58,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
         }
 
         .nav-links {
@@ -74,7 +67,7 @@
         }
 
         .nav-links a {
-            color: #1f2937;
+            color: var(--gray-dark);
             text-decoration: none;
             font-weight: 500;
             padding: 0.5rem 1rem;
@@ -82,13 +75,9 @@
             transition: all 0.3s ease;
         }
 
-        .nav-links a:hover {
-            color: #6366f1;
-            background: rgba(99, 102, 241, 0.1);
-        }
-
+        .nav-links a:hover,
         .nav-links a.active {
-            color: #6366f1;
+            color: var(--primary);
             background: rgba(99, 102, 241, 0.1);
         }
 
@@ -99,7 +88,7 @@
         }
 
         .cart-count {
-            background: #6366f1;
+            background: var(--primary);
             color: white;
             border-radius: 50%;
             width: 20px;
@@ -111,6 +100,7 @@
             font-weight: 600;
         }
 
+        /* Main content */
         main {
             padding-top: 8rem;
             min-height: 100vh;
@@ -119,14 +109,14 @@
         h1 {
             font-size: 3rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #6366f1 0%, #f59e0b 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            background-clip: text;
             margin-bottom: 2rem;
             text-align: center;
         }
 
+        /* Cart Table */
         .cart-table {
             width: 100%;
             border-collapse: collapse;
@@ -145,39 +135,54 @@
         }
 
         .cart-table th {
-            background: #f8fafc;
+            background: var(--gray-light);
             font-weight: 600;
-            color: #374151;
+            color: var(--gray-dark);
         }
 
         .cart-table tr:last-child td {
             border-bottom: none;
         }
 
+        .product-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .product-info img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
         #cart-summary {
             background: white;
             padding: 2rem;
             border-radius: 12px;
+            text-align: right;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
             margin-bottom: 2rem;
-            text-align: right;
         }
 
         #cart-summary h3 {
             font-size: 1.5rem;
-            color: #1f2937;
+            color: var(--gray-dark);
         }
 
+        /* Checkout Form */
         .cart-form {
             background: white;
             padding: 2rem;
             border-radius: 12px;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
         }
 
         .cart-form h2 {
             margin-bottom: 1.5rem;
-            color: #1f2937;
+            color: var(--gray-dark);
         }
 
         .form-group {
@@ -188,7 +193,7 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #374151;
+            color: var(--gray-dark);
         }
 
         .form-group input,
@@ -204,7 +209,7 @@
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #6366f1;
+            border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
@@ -215,108 +220,118 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
         }
 
         .btn-primary {
-            background: #6366f1;
+            background: var(--primary);
             color: white;
         }
 
         .btn-primary:hover {
-            background: #4f46e5;
+            background: var(--primary-dark);
             transform: translateY(-2px);
         }
 
         .btn-secondary {
             background: transparent;
-            color: #6366f1;
-            border: 2px solid #6366f1;
+            color: var(--primary);
+            border: 2px solid var(--primary);
         }
 
         .btn-secondary:hover {
-            background: #6366f1;
+            background: var(--primary);
             color: white;
         }
 
         input[type="number"] {
             width: 80px;
             padding: 0.5rem;
-            border: 2px solid #e5e7eb;
             border-radius: 6px;
             text-align: center;
         }
 
+        /* Empty cart */
+        .empty-cart {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-mid);
+        }
+
+        .empty-cart i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-cart h3 {
+            margin: 0.5rem 0;
+        }
+
+        .empty-cart p {
+            margin: 0.5rem 0 1rem 0;
+            color: #9ca3af;
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
                 gap: 1rem;
             }
-            
-            .cart-table {
-                font-size: 0.9rem;
-            }
-            
+
             .cart-table th,
             .cart-table td {
                 padding: 0.5rem;
-            }
-            
-            .activity-tracker-icon {
-                bottom: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.25rem;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
+
 <body>
-
-    <!-- Loading Bar -->
-    <div class="loading-bar" id="loadingBar"></div>
-
+    <!-- Header -->
     <header>
-        <nav>
-            <div class="container nav-container">
-                <a href="index.html" class="logo">TechGear</a>
-                <div class="nav-links">
-                    <a href="index.html">Home</a>
-                    <a href="products.html">Products</a>
-                    <a href="cart.html" class="cart-icon active">
-                        Cart
-                        <span class="cart-count">0</span>
-                    </a>
-                </div>
+        <nav class="container nav-container">
+            <a href="index.html" class="logo">TechGear</a>
+            <div class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="products.html">Products</a>
+                <a href="cart.html" class="cart-icon active">
+                    Cart <span class="cart-count">0</span>
+                </a>
             </div>
         </nav>
     </header>
 
+    <!-- Main -->
     <main class="container">
         <h1>Shopping Cart</h1>
-        <div id="cart-content">
+
+        <!-- Cart Table -->
+        <section id="cart-content">
             <table class="cart-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Total</th>
-                        <th>Action</th>
+                        <th scope="col">Product</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Quantity</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody id="cart-items">
-                    <!-- Cart items will be dynamically inserted here -->
+                    <!-- Cart items dynamically inserted -->
                 </tbody>
             </table>
+
+            <!-- Cart Summary -->
             <div id="cart-summary">
                 <h3>Total: $<span id="cart-total">0.00</span></h3>
             </div>
-        </div>
+        </section>
 
+        <!-- Checkout Form -->
         <form id="checkout-form" class="cart-form">
             <h2>Checkout Information</h2>
             <div class="form-group">
@@ -339,125 +354,92 @@
         </form>
     </main>
 
-    <!-- Font Awesome for icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Import Activity Tracker and Cart Management -->
+    <!-- Scripts -->
     <script src="../activity-tracker.js"></script>
+    <script> document.addEventListener('DOMContentLoaded', () => { window.activityTracker = new ActivityTracker(); }); </script>
     <script src="cart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Initialize Activity Tracker
-            const tracker = new ActivityTracker();
-            
-            // Set up activity tracker icon click event
-            const activityTrackerIcon = document.getElementById('activityTrackerIcon');
-            if (activityTrackerIcon) {
-                activityTrackerIcon.addEventListener('click', () => {
-                    // This will trigger the activity tracker panel to open
-                    console.log('Activity tracker icon clicked');
-                });
-            }
-            
-            // Loading bar animation
-            const loadingBar = document.getElementById('loadingBar');
-            if (loadingBar) {
-                loadingBar.style.width = '100%';
-                setTimeout(() => {
-                    loadingBar.style.opacity = '0';
-                    setTimeout(() => loadingBar.remove(), 300);
-                }, 500);
-            }
+            window.activityTracker = new ActivityTracker();
 
-            displayCart();
-        });
-
-        function displayCart() {
-            const cartItems = cart.getCart();
-            const tbody = document.getElementById('cart-items');
-            const total = document.getElementById('cart-total');
+            const cartTable = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
             const cartCount = document.querySelector('.cart-count');
-            
-            tbody.innerHTML = '';
-            
-            if (cartItems.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 3rem;">
-                            <i class="fas fa-shopping-cart" style="font-size: 3rem; color: #9ca3af; margin-bottom: 1rem;"></i>
-                            <h3 style="color: #6b7280; margin-bottom: 0.5rem;">Your cart is empty</h3>
-                            <p style="color: #9ca3af;">Add some products to your cart to see them here.</p>
-                            <a href="products.html" class="btn btn-primary" style="margin-top: 1rem;">
-                                <i class="fas fa-shopping-bag"></i> Browse Products
-                            </a>
-                        </td>
-                    </tr>
-                `;
-            } else {
-                cartItems.forEach(item => {
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <img src="${item.image}" alt="${item.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 6px;">
-                                <span>${item.name}</span>
-                            </div>
-                        </td>
-                        <td>$${item.price.toFixed(2)}</td>
-                        <td>
-                            <input type="number" value="${item.quantity}" min="1" 
-                                onchange="updateQuantity('${item.id}', this.value)">
-                        </td>
-                        <td>$${(item.price * item.quantity).toFixed(2)}</td>
-                        <td>
-                            <button class="btn btn-secondary" onclick="removeItem('${item.id}')">
-                                <i class="fas fa-trash"></i> Remove
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-            
-            const totalAmount = cart.getTotal();
-            total.textContent = totalAmount.toFixed(2);
-            
-            // Update cart count in header
-            if (cartCount) {
-                const totalItems = cartItems.reduce((total, item) => total + item.quantity, 0);
-                cartCount.textContent = totalItems;
-            }
-        }
 
-        function updateQuantity(productId, quantity) {
-            const newQuantity = parseInt(quantity);
-            if (newQuantity < 1) {
-                removeItem(productId);
-            } else {
-                cart.updateQuantity(productId, newQuantity);
-                displayCart();
-            }
-        }
+            function renderCart() {
+                const items = cart.getCart();
+                cartTable.innerHTML = '';
 
-        function removeItem(productId) {
-            cart.removeFromCart(productId);
-            displayCart();
-        }
+                if (!items.length) {
+                    cartTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="empty-cart">
+                                <i class="fas fa-shopping-cart"></i>
+                                <h3>Your cart is empty</h3>
+                                <p>Add products to see them here.</p>
+                                <a href="products.html" class="btn btn-primary">
+                                    <i class="fas fa-shopping-bag"></i> Browse Products
+                                </a>
+                            </td>
+                        </tr>`;
+                } else {
+                    items.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.dataset.id = item.id;
+                        tr.innerHTML = `
+                            <td>
+                                <div class="product-info">
+                                    <img src="${item.image}" alt="${item.name}">
+                                    <span>${item.name}</span>
+                                </div>
+                            </td>
+                            <td>$${item.price.toFixed(2)}</td>
+                            <td><input type="number" value="${item.quantity}" min="1"></td>
+                            <td>$${(item.price * item.quantity).toFixed(2)}</td>
+                            <td><button class="btn btn-secondary remove-btn" aria-label="Remove ${item.name}">
+                                <i class="fas fa-trash"></i>
+                            </button></td>`;
+                        cartTable.appendChild(tr);
+                    });
+                }
 
-        document.getElementById('checkout-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (cart.getCart().length === 0) {
-                alert('Your cart is empty!');
-                return;
+                cartTotal.textContent = cart.getTotal().toFixed(2);
+                cartCount.textContent = items.reduce((sum, i) => sum + i.quantity, 0);
             }
-            
-            alert('Order placed successfully! This is a demo, so no actual order is processed.');
-            cart.clearCart();
-            displayCart();
-            
-            // Reset form
-            e.target.reset();
+
+            // Event delegation
+            cartTable.addEventListener('change', e => {
+                if (e.target.tagName === 'INPUT') {
+                    const id = e.target.closest('tr').dataset.id;
+                    const qty = parseInt(e.target.value);
+                    if (qty < 1) cart.removeFromCart(id);
+                    else cart.updateQuantity(id, qty);
+                    renderCart();
+                }
+            });
+
+            cartTable.addEventListener('click', e => {
+                if (e.target.closest('.remove-btn')) {
+                    const id = e.target.closest('tr').dataset.id;
+                    cart.removeFromCart(id);
+                    renderCart();
+                }
+            });
+
+            // Checkout form
+            document.getElementById('checkout-form').addEventListener('submit', e => {
+                e.preventDefault();
+                if (!cart.getCart().length) return alert('Your cart is empty!');
+                alert('Order placed successfully! (Demo)');
+                cart.clearCart();
+                renderCart();
+                e.target.reset();
+            });
+
+            renderCart();
         });
     </script>
 </body>
+
 </html>

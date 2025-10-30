@@ -1,76 +1,110 @@
 class ShoppingCart {
     constructor() {
-        this.cart = JSON.parse(localStorage.getItem('cart')) || [];
-        this.updateCartCount();
-    }
-
-    addToCart(product) {
-        const existingItem = this.cart.find(item => item.id === product.id);
-        
-        if (existingItem) {
-            existingItem.quantity += 1;
-        } else {
-            this.cart.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.image,
-                quantity: 1
-            });
+        // internal storage for cart items (array of {id, name, price, image, quantity, ...})
+        this._items = [];
+        // hydrate from localStorage if present
+        try {
+            const raw = localStorage.getItem('cart');
+            this._items = raw ? JSON.parse(raw) : [];
+        } catch (err) {
+            // if parse fails, start with an empty cart
+            this._items = [];
+            console.warn('Failed to parse saved cart, starting fresh.', err);
         }
-        
-        this.saveCart();
-        this.updateCartCount();
-        return this.cart.length;
-    }
 
-    removeFromCart(productId) {
-        this.cart = this.cart.filter(item => item.id !== productId);
-        this.saveCart();
+        // ensure visible cart count is in sync
         this.updateCartCount();
     }
 
-    updateQuantity(productId, quantity) {
-        const item = this.cart.find(item => item.id === productId);
-        if (item) {
-            item.quantity = parseInt(quantity);
-            if (item.quantity <= 0) {
-                this.removeFromCart(productId);
-            } else {
-                this.saveCart();
+    // Add a product to cart; if present increments quantity
+    addToCart(product) {
+        // look for existing item by id
+        for (let i = 0; i < this._items.length; i++) {
+            if (this._items[i].id === product.id) {
+                this._items[i].quantity = (this._items[i].quantity || 0) + 1;
+                this._persist();
                 this.updateCartCount();
+                return;
             }
         }
-    }
 
-    getTotal() {
-        return this.cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-    }
+        // not found — push a shallow clone with initial quantity
+        const entry = Object.assign({}, product, { quantity: 1 });
+        this._items.push(entry);
 
-    getCart() {
-        return this.cart;
-    }
-
-    clearCart() {
-        this.cart = [];
-        this.saveCart();
+        this._persist();
         this.updateCartCount();
     }
 
-    saveCart() {
-        localStorage.setItem('cart', JSON.stringify(this.cart));
+    // Remove an item completely by productId
+    removeFromCart(productId) {
+        this._items = this._items.filter(i => i.id !== productId);
+        this._persist();
+        this.updateCartCount();
     }
 
-    updateCartCount() {
-        const cartCountElements = document.querySelectorAll('.cart-count');
-        if (cartCountElements.length > 0) {
-            const totalItems = this.cart.reduce((total, item) => total + item.quantity, 0);
-            cartCountElements.forEach(element => {
-                element.textContent = totalItems;
-            });
+    // Set quantity for an item; if quantity <= 0 the item is removed
+    updateQuantity(productId, quantity) {
+        const qty = Number(quantity) || 0;
+        for (let i = 0; i < this._items.length; i++) {
+            if (this._items[i].id === productId) {
+                if (qty <= 0) {
+                    // remove item
+                    this._items.splice(i, 1);
+                } else {
+                    this._items[i].quantity = Math.floor(qty);
+                }
+                this._persist();
+                this.updateCartCount();
+                return;
+            }
         }
+        // if item not found, do nothing
+    }
+
+    // Compute the cart total (number)
+    getTotal() {
+        return this._items.reduce((sum, it) => {
+            const price = Number(it.price) || 0;
+            const qty = Number(it.quantity) || 0;
+            return sum + (price * qty);
+        }, 0);
+    }
+
+    // Return the raw cart array (for rendering)
+    getCart() {
+        return this._items;
+    }
+
+    // Empty the cart completely
+    clearCart() {
+        this._items = [];
+        this._persist();
+        this.updateCartCount();
+    }
+
+    // -------------------
+    // Internal helpers
+    // -------------------
+
+    // Save current cart to localStorage
+    _persist() {
+        try {
+            localStorage.setItem('cart', JSON.stringify(this._items));
+        } catch (err) {
+            console.error('Unable to save cart to localStorage', err);
+        }
+    }
+
+    // Update the visual cart count element (.cart-count) if present
+    updateCartCount() {
+        const el = document.querySelector('.cart-count');
+        if (!el) return;
+
+        const totalItems = this._items.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0);
+        el.textContent = totalItems;
     }
 }
 
-// Global cart instance
+// create a single global instance (keeps compatibility with existing code)
 const cart = new ShoppingCart();

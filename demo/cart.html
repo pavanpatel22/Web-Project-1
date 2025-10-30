@@ -1,445 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart - TechGear Shop</title>
-
-    <!-- External CSS -->
-    <link rel="stylesheet" href="../activity-tracker.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #f59e0b;
-            --gray-light: #f8fafc;
-            --gray-dark: #374151;
-            --gray-mid: #6b7280;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            background: #f9fafb;
-        }
-
-        /* Header & Navbar */
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1rem 0;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--gray-dark);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .cart-icon {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .cart-count {
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* Main content */
-        main {
-            padding-top: 8rem;
-            min-height: 100vh;
-        }
-
-        h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        /* Cart Table */
-        .cart-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .cart-table th,
-        .cart-table td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .cart-table th {
-            background: var(--gray-light);
-            font-weight: 600;
-            color: var(--gray-dark);
-        }
-
-        .cart-table tr:last-child td {
-            border-bottom: none;
-        }
-
-        .product-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .product-info img {
-            width: 50px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-
-        #cart-summary {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: right;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        #cart-summary h3 {
-            font-size: 1.5rem;
-            color: var(--gray-dark);
-        }
-
-        /* Checkout Form */
-        .cart-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-        }
-
-        .cart-form h2 {
-            margin-bottom: 1.5rem;
-            color: var(--gray-dark);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--gray-dark);
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        input[type="number"] {
-            width: 80px;
-            padding: 0.5rem;
-            border-radius: 6px;
-            text-align: center;
-        }
-
-        /* Empty cart */
-        .empty-cart {
-            text-align: center;
-            padding: 3rem;
-            color: var(--gray-mid);
-        }
-
-        .empty-cart i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .empty-cart h3 {
-            margin: 0.5rem 0;
-        }
-
-        .empty-cart p {
-            margin: 0.5rem 0 1rem 0;
-            color: #9ca3af;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .cart-table th,
-            .cart-table td {
-                padding: 0.5rem;
-                font-size: 0.9rem;
-            }
-        }
-    </style>
+    <title>Cart - TechGear Shop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../timeline-styles.css">
 </head>
 
 <body>
-    <!-- Header -->
     <header>
-        <nav class="container nav-container">
-            <a href="index.html" class="logo">TechGear</a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="products.html">Products</a>
-                <a href="cart.html" class="cart-icon active">
-                    Cart <span class="cart-count">0</span>
-                </a>
+        <nav>
+            <div class="container nav-container">
+                <a href="index.html" class="logo">TechGear</a>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="products.html">Products</a>
+                    <a href="cart.html" class="cart-icon">
+                        Cart <span class="cart-count">0</span>
+                    </a>
+                </div>
             </div>
         </nav>
     </header>
 
-    <!-- Main -->
     <main class="container">
-        <h1>Shopping Cart</h1>
+        <h1>Your Shopping Cart</h1>
 
-        <!-- Cart Table -->
-        <section id="cart-content">
+        <!-- Cart Items Table -->
+        <div id="cart-content">
             <table class="cart-table">
                 <thead>
                     <tr>
-                        <th scope="col">Product</th>
-                        <th scope="col">Price</th>
-                        <th scope="col">Quantity</th>
-                        <th scope="col">Total</th>
-                        <th scope="col">Action</th>
+                        <th>Item</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Remove</th>
                     </tr>
                 </thead>
                 <tbody id="cart-items">
-                    <!-- Cart items dynamically inserted -->
+                    <!-- Dynamic rows added here -->
                 </tbody>
             </table>
 
-            <!-- Cart Summary -->
             <div id="cart-summary">
                 <h3>Total: $<span id="cart-total">0.00</span></h3>
             </div>
-        </section>
+        </div>
 
         <!-- Checkout Form -->
         <form id="checkout-form" class="cart-form">
-            <h2>Checkout Information</h2>
+            <h2>Checkout</h2>
+
             <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" required>
+                <label for="fullName">Full Name</label>
+                <input id="fullName" name="name" type="text" required>
             </div>
+
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
+                <label for="userEmail">Email</label>
+                <input id="userEmail" name="email" type="email" required>
             </div>
+
             <div class="form-group">
-                <label for="address">Shipping Address</label>
-                <textarea id="address" name="address" required></textarea>
+                <label for="shippingAddress">Shipping Address</label>
+                <textarea id="shippingAddress" name="address" required></textarea>
             </div>
+
             <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" required>
+                <label for="contactNumber">Phone Number</label>
+                <input id="contactNumber" name="phone" type="tel" required>
             </div>
-            <button type="submit" class="btn btn-primary">Place Order</button>
+
+            <button type="submit" class="btn btn-primary">Confirm Order</button>
         </form>
     </main>
 
-    <!-- Scripts -->
+    <!-- Activity Tracker + Cart Logic -->
     <script src="../activity-tracker.js"></script>
-    <script> document.addEventListener('DOMContentLoaded', () => { window.activityTracker = new ActivityTracker(); }); </script>
     <script src="cart.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize Activity Tracker
-            window.activityTracker = new ActivityTracker();
+            renderCart();
+        });
 
-            const cartTable = document.getElementById('cart-items');
-            const cartTotal = document.getElementById('cart-total');
-            const cartCount = document.querySelector('.cart-count');
+        // Render the cart table dynamically
+        function renderCart() {
+            const cartData = cart.getCart();
+            const tableBody = document.getElementById('cart-items');
+            const totalPriceEl = document.getElementById('cart-total');
 
-            function renderCart() {
-                const items = cart.getCart();
-                cartTable.innerHTML = '';
+            tableBody.innerHTML = '';
 
-                if (!items.length) {
-                    cartTable.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="empty-cart">
-                                <i class="fas fa-shopping-cart"></i>
-                                <h3>Your cart is empty</h3>
-                                <p>Add products to see them here.</p>
-                                <a href="products.html" class="btn btn-primary">
-                                    <i class="fas fa-shopping-bag"></i> Browse Products
-                                </a>
-                            </td>
-                        </tr>`;
-                } else {
-                    items.forEach(item => {
-                        const tr = document.createElement('tr');
-                        tr.dataset.id = item.id;
-                        tr.innerHTML = `
-                            <td>
-                                <div class="product-info">
-                                    <img src="${item.image}" alt="${item.name}">
-                                    <span>${item.name}</span>
-                                </div>
-                            </td>
-                            <td>$${item.price.toFixed(2)}</td>
-                            <td><input type="number" value="${item.quantity}" min="1"></td>
-                            <td>$${(item.price * item.quantity).toFixed(2)}</td>
-                            <td><button class="btn btn-secondary remove-btn" aria-label="Remove ${item.name}">
-                                <i class="fas fa-trash"></i>
-                            </button></td>`;
-                        cartTable.appendChild(tr);
-                    });
-                }
+            cartData.forEach(product => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div style="display:flex;align-items:center;gap:1rem;">
+                            <img src="${product.image}" alt="${product.name}" 
+                                 style="width:50px;height:50px;object-fit:cover;">
+                            <span>${product.name}</span>
+                        </div>
+                    </td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>
+                        <input type="number" min="0" value="${product.quantity}" 
+                               onchange="adjustQty('${product.id}', this.value)">
+                    </td>
+                    <td>$${(product.price * product.quantity).toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="deleteItem('${product.id}')">Remove</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
 
-                cartTotal.textContent = cart.getTotal().toFixed(2);
-                cartCount.textContent = items.reduce((sum, i) => sum + i.quantity, 0);
+            totalPriceEl.textContent = cart.getTotal().toFixed(2);
+        }
+
+        // Adjust quantity of product
+        function adjustQty(id, qty) {
+            cart.updateQuantity(id, qty);
+            renderCart();
+        }
+
+        // Delete item from cart
+        function deleteItem(id) {
+            cart.removeFromCart(id);
+            renderCart();
+        }
+
+        // Checkout form handler
+        document.getElementById('checkout-form').addEventListener('submit', event => {
+            event.preventDefault();
+
+            if (cart.getCart().length === 0) {
+                alert('Your cart is empty!');
+                return;
             }
 
-            // Event delegation
-            cartTable.addEventListener('change', e => {
-                if (e.target.tagName === 'INPUT') {
-                    const id = e.target.closest('tr').dataset.id;
-                    const qty = parseInt(e.target.value);
-                    if (qty < 1) cart.removeFromCart(id);
-                    else cart.updateQuantity(id, qty);
-                    renderCart();
-                }
-            });
-
-            cartTable.addEventListener('click', e => {
-                if (e.target.closest('.remove-btn')) {
-                    const id = e.target.closest('tr').dataset.id;
-                    cart.removeFromCart(id);
-                    renderCart();
-                }
-            });
-
-            // Checkout form
-            document.getElementById('checkout-form').addEventListener('submit', e => {
-                e.preventDefault();
-                if (!cart.getCart().length) return alert('Your cart is empty!');
-                alert('Order placed successfully! (Demo)');
-                cart.clearCart();
-                renderCart();
-                e.target.reset();
-            });
-
+            alert('Your order has been placed successfully! (Demo only)');
+            cart.clearCart();
             renderCart();
         });
     </script>
 </body>
-
 </html>

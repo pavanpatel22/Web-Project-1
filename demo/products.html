@@ -1,1153 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products - TechGear Shop</title>
-    <link rel="stylesheet" href="../activity-tracker.css">
-    <!-- Modern Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #f59e0b;
-            --accent: #10b981;
-            --dark: #1f2937;
-            --darker: #111827;
-            --light: #f8fafc;
-            --gray: #6b7280;
-            --gray-light: #e5e7eb;
-            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            --radius: 12px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            color: var(--dark);
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            position: relative;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header & Navigation */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            padding: 1rem 0;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: var(--dark);
-            text-decoration: none;
-            font-weight: 500;
-            padding: 0.5rem 1rem;
-            border-radius: var(--radius);
-            transition: var(--transition);
-            position: relative;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .nav-links a.active {
-            color: var(--primary);
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .cart-icon {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .cart-count {
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        /* Products Header */
-        .products-header {
-            padding: 8rem 0 2rem;
-            text-align: center;
-        }
-
-        .products-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 1rem;
-        }
-
-        .products-header p {
-            font-size: 1.2rem;
-            color: var(--gray);
-            max-width: 600px;
-            margin: 0 auto 2rem;
-        }
-
-        /* Search & Filters */
-        .search-container {
-            position: relative;
-            max-width: 500px;
-            margin: 0 auto 2rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
-            border: 2px solid var(--gray-light);
-            border-radius: 50px;
-            font-size: 1rem;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-        }
-
-        .filter-tags {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-
-        .filter-tag {
-            padding: 0.75rem 1.5rem;
-            background: white;
-            border: 2px solid var(--gray-light);
-            border-radius: 50px;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .filter-tag:hover, .filter-tag.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-
-        .filters {
-            display: flex;
-            gap: 2rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 3rem;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .filter-group label {
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .filter-group select {
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius);
-            font-size: 1rem;
-            background: white;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .filter-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Products Grid */
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 2rem;
-            padding: 2rem 0;
-        }
-
-        .product-card {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .product-image-container {
-            position: relative;
-            overflow: hidden;
-            height: 250px;
-        }
-
-        .product-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .product-card:hover .product-image {
-            transform: scale(1.05);
-        }
-
-        .product-badge {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            background: var(--secondary);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .wishlist-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255, 255, 255, 0.9);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            color: var(--gray);
-        }
-
-        .wishlist-btn:hover, .wishlist-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        .quick-view {
-            position: absolute;
-            bottom: 1rem;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: var(--transition);
-        }
-
-        .product-card:hover .quick-view {
-            opacity: 1;
-        }
-
-        .quick-view-btn {
-            background: rgba(255, 255, 255, 0.95);
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            backdrop-filter: blur(10px);
-        }
-
-        .quick-view-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .product-info {
-            padding: 1.5rem;
-        }
-
-        .product-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        .product-description {
-            color: var(--gray);
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            line-height: 1.5;
-        }
-
-        .product-price-container {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .product-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .original-price {
-            font-size: 1rem;
-            color: var(--gray);
-            text-decoration: line-through;
-        }
-
-        .discount {
-            background: var(--accent);
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .product-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .product-category {
-            background: var(--gray-light);
-            color: var(--dark);
-            padding: 0.25rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .rating {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .rating-stars {
-            color: var(--secondary);
-        }
-
-        .rating-count {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-
-        .product-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            flex: 1;
-            justify-content: center;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-
-        .btn-secondary:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--gray);
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--dark);
-        }
-
-        /* Animations */
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .animate-slide-in {
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); }
-            to { transform: translateX(0); }
-        }
-
-        /* Notifications */
-        .notification {
-            position: fixed;
-            top: 100px;
-            right: 20px;
-            background: var(--accent);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 1001;
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        /* Test Form Section */
-        .test-form-section {
-            background: #f8f9fa;
-            padding: 3rem 2rem;
-            margin: 2rem 0;
-            border-radius: var(--radius);
-            text-align: center;
-        }
-
-        .test-form {
-            display: flex;
-            gap: 1rem;
-            max-width: 500px;
-            margin: 0 auto;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .test-form input {
-            padding: 0.75rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: var(--radius);
-            font-size: 1rem;
-            min-width: 200px;
-        }
-
-        .test-form button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .test-form button:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--darker);
-            color: white;
-            padding: 3rem 0;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .footer-section h3 {
-            color: var(--secondary);
-            margin-bottom: 1rem;
-        }
-
-        .footer-section a {
-            color: var(--gray-light);
-            text-decoration: none;
-            transition: var(--transition);
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-
-        .footer-section a:hover {
-            color: white;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            margin-top: 2rem;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--gray);
-        }
-
-        /* Loading Bar */
-        .loading-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 0%;
-            height: 3px;
-            background: var(--gradient);
-            z-index: 9999;
-            transition: width 0.3s ease;
-        }
-
-        /* Activity Tracker Icon */
-        .activity-tracker-icon {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: var(--gradient);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            transition: var(--transition);
-            border: none;
-        }
-
-        .activity-tracker-icon:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .products-header h1 {
-                font-size: 2rem;
-            }
-
-            .nav-links {
-                gap: 1rem;
-            }
-
-            .filters {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .filter-tags {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .products-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .product-actions {
-                flex-direction: column;
-            }
-
-            .activity-tracker-icon {
-                bottom: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-                font-size: 1.25rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Products | Patel Store</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="../timeline-styles.css">
 </head>
+
 <body>
-    <!-- Loading Bar -->
-    <div class="loading-bar" id="loadingBar"></div>
+  <!-- ================= HEADER ================= -->
+  <header>
+    <nav>
+      <div class="nav-container container">
+        <a class="logo" href="index.html">Patel</a>
 
-    <!-- Header -->
-    <header class="header">
-        <div class="container nav-container">
-            <a href="index.html" class="logo">TechGear</a>
-            <div class="nav-links">
-                <a href="index.html">Home</a>
-                <a href="products.html" class="active">Products</a>
-                <a href="cart.html" class="cart-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                    Cart
-                    <span class="cart-count">0</span>
-                </a>
-            </div>
+        <div class="nav-links">
+          <a href="index.html">Home</a>
+          <a href="products.html">Products</a>
+          <a href="cart.html" class="cart-icon">
+            Cart
+            <span class="cart-count">0</span>
+          </a>
         </div>
-    </header>
+      </div>
+    </nav>
+  </header>
 
-    <main class="container">
-        <section class="products-header">
-            <h1>Discover Our Tech Collection</h1>
-            <p>Explore cutting-edge technology designed to enhance your digital lifestyle</p>
-            
-            <!-- Search Bar -->
-            <div class="search-container">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" id="search-input" class="search-input" placeholder="Search products...">
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="container">
+    <section class="products-header">
+      <h1>Available Products</h1>
+
+      <div class="filters">
+        <select id="category-filter">
+          <option value="all">All Categories</option>
+          <option value="audio">Audio</option>
+          <option value="wearables">Wearables</option>
+          <option value="accessories">Accessories</option>
+        </select>
+
+        <select id="sort-filter">
+          <option value="default">Sort by: Featured</option>
+          <option value="price-low">Price: Low to High</option>
+          <option value="price-high">Price: High to Low</option>
+          <option value="name">Name: A to Z</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Product grid gets filled dynamically -->
+    <div id="products-grid" class="products-grid"></div>
+  </main>
+
+  <!-- ================= SCRIPTS ================= -->
+  <script src="../activity-tracker.js"></script>
+  <script src="cart.js"></script>
+
+  <script>
+    /* Product Listing Script — revised formatting only */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProducts();
+      setupFilters();
+    });
+
+    const products = [
+      {
+        id: 'p1',
+        name: 'Premium Wireless Headphones',
+        price: 199.99,
+        category: 'audio',
+        image: 'https://prd.place/408',
+        description: 'Top-notch wireless headphones with noise cancelling tech.'
+      },
+      {
+        id: 'p2',
+        name: 'Smart Fitness Watch',
+        price: 149.99,
+        category: 'wearables',
+        image: 'https://prd.place/409',
+        description: 'Advanced smartwatch to help track your daily fitness goals.'
+      },
+      {
+        id: 'p3',
+        name: 'Portable Bluetooth Speaker',
+        price: 79.99,
+        category: 'audio',
+        image: 'https://prd.place/410',
+        description: 'Compact speaker with rich sound for travel and outdoor fun.'
+      },
+      {
+        id: 'p4',
+        name: 'True Wireless Earbuds',
+        price: 129.99,
+        category: 'audio',
+        image: 'https://prd.place/411',
+        description: 'Lightweight, comfortable earbuds ideal for everyday listening.'
+      },
+      {
+        id: 'p5',
+        name: '20000mAh Power Bank',
+        price: 49.99,
+        category: 'accessories',
+        image: 'https://prd.place/412',
+        description: 'Reliable high-capacity power bank for charging multiple devices.'
+      },
+      {
+        id: 'p6',
+        name: 'Fast Wireless Charger',
+        price: 39.99,
+        category: 'accessories',
+        image: 'https://via.placeholder.com/300',
+        description: 'Qi-enabled charger for efficient, cable-free charging.'
+      }
+    ];
+
+    // === Render Product Cards ===
+    function loadProducts(filtered = products) {
+      const grid = document.getElementById('products-grid');
+      grid.innerHTML = '';
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${item.image}" alt="Product - ${item.name}" class="product-image" />
+          <div class="product-info">
+            <h3 class="product-title">${item.name}</h3>
+            <p class="product-price">$${item.price.toFixed(2)}</p>
+            <p class="product-category">${item.category}</p>
+            <div class="product-actions">
+              <a href="product1.html" class="btn btn-secondary">View Details</a>
+              <button 
+                class="btn btn-primary" 
+                onclick="addToCart(${JSON.stringify(item).replace(/"/g, '&quot;')})">
+                Add to Cart
+              </button>
             </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
 
-            <!-- Filter Tags -->
-            <div class="filter-tags">
-                <div class="filter-tag active" data-category="all">
-                    <i class="fas fa-th-large"></i> All Products
-                </div>
-                <div class="filter-tag" data-category="audio">
-                    <i class="fas fa-headphones"></i> Audio
-                </div>
-                <div class="filter-tag" data-category="wearables">
-                    <i class="fas fa-watch"></i> Wearables
-                </div>
-                <div class="filter-tag" data-category="accessories">
-                    <i class="fas fa-bolt"></i> Accessories
-                </div>
-            </div>
+    // === Category & Sorting Filters ===
+    function setupFilters() {
+      const categorySelect = document.getElementById('category-filter');
+      const sortSelect = document.getElementById('sort-filter');
 
-            <div class="filters">
-                <div class="filter-group">
-                    <label for="category-filter">Category</label>
-                    <select id="category-filter">
-                        <option value="all">All Categories</option>
-                        <option value="audio">Audio</option>
-                        <option value="wearables">Wearables</option>
-                        <option value="accessories">Accessories</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="sort-filter">Sort By</label>
-                    <select id="sort-filter">
-                        <option value="default">Featured</option>
-                        <option value="price-low">Price: Low to High</option>
-                        <option value="price-high">Price: High to Low</option>
-                        <option value="name">Name: A to Z</option>
-                    </select>
-                </div>
-            </div>
-        </section>
+      const applyFilters = () => {
+        let result = [...products];
 
-        <!-- Test Form Section -->
-        <section class="test-form-section">
-            <h3>Test Activity Tracker</h3>
-            <p>Use this form to test form submission tracking</p>
-            <form class="test-form" id="test-form">
-                <input type="text" placeholder="Your name" required>
-                <input type="email" placeholder="Your email" required>
-                <button type="submit" class="btn-primary">Submit Test Form</button>
-            </form>
-        </section>
-
-        <div id="products-grid" class="products-grid">
-            <!-- Products will be dynamically loaded here -->
-        </div>
-    </main>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h3>TechGear</h3>
-                    <p>Premium technology products designed for the modern lifestyle. Quality, innovation, and performance.</p>
-                </div>
-                <div class="footer-section">
-                    <h3>Quick Links</h3>
-                    <a href="index.html">Home</a>
-                    <a href="products.html">Products</a>
-                    <a href="#">About Us</a>
-                    <a href="#">Contact</a>
-                </div>
-                <div class="footer-section">
-                    <h3>Connect With Us</h3>
-                    <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
-                    <a href="#"><i class="fab fa-facebook"></i> Facebook</a>
-                    <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
-                    <a href="#"><i class="fab fa-linkedin"></i> LinkedIn</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 TechGear. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script src="../activity-tracker.js"></script>
-    <script src="cart.js"></script>
-    
-    <!-- Enhanced JavaScript -->
-    <script>
-        // Initialize Activity Tracker
-        document.addEventListener('DOMContentLoaded', () => {
-            // Activity tracker icon event listener
-            const activityTrackerIcon = document.getElementById('activityTrackerIcon');
-            if (activityTrackerIcon) {
-                activityTrackerIcon.addEventListener('click', () => {
-                    // This will trigger the activity tracker panel to open
-                    console.log('Activity tracker icon clicked');
-                });
-            }
-            
-            loadProducts();
-            setupFilters();
-            setupSearch();
-            setupFilterTags();
-            updateCartCount();
-            
-            // Loading bar animation
-            const loadingBar = document.getElementById('loadingBar');
-            if (loadingBar) {
-                loadingBar.style.width = '100%';
-                setTimeout(() => {
-                    loadingBar.style.opacity = '0';
-                    setTimeout(() => loadingBar.remove(), 300);
-                }, 500);
-            }
-
-            // Test form submission
-            document.getElementById('test-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const button = e.target.querySelector('button');
-                const originalText = button.innerHTML;
-                
-                button.innerHTML = '<i class="fas fa-check"></i> Submitted!';
-                button.style.background = 'var(--accent)';
-                
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.style.background = '';
-                }, 2000);
-            });
-        });
-
-        // Products data
-        const products = [
-            {
-                id: 'p1',
-                name: 'Premium Wireless Headphones',
-                price: 199.99,
-                originalPrice: 249.99,
-                category: 'audio',
-                image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-                description: 'High-quality wireless headphones with active noise cancellation and premium sound quality.',
-                rating: 4.8,
-                reviewCount: 1247,
-                badge: 'Bestseller'
-            },
-            {
-                id: 'p2',
-                name: 'Smart Fitness Watch',
-                price: 149.99,
-                originalPrice: 199.99,
-                category: 'wearables',
-                image: 'https://images.unsplash.com/photo-1544117519-31a4b719223d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-                description: 'Track your fitness goals with this advanced smartwatch featuring heart rate monitoring and GPS.',
-                rating: 4.6,
-                reviewCount: 892,
-                badge: 'Popular'
-            },
-            {
-                id: 'p3',
-                name: 'Portable Bluetooth Speaker',
-                price: 79.99,
-                category: 'audio',
-                image: 'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-                description: 'Powerful and portable speaker with 360° sound for your outdoor adventures and parties.',
-                rating: 4.4,
-                reviewCount: 567,
-                badge: 'New'
-            },
-            {
-                id: 'p4',
-                name: 'True Wireless Earbuds',
-                price: 129.99,
-                category: 'audio',
-                image: 'https://images.unsplash.com/photo-1590658165737-15a047b8b5e7?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-                description: 'Compact and comfortable wireless earbuds with crystal clear audio and long battery life.',
-                rating: 4.7,
-                reviewCount: 1034,
-                badge: 'Trending'
-            },
-            {
-                id: 'p5',
-                name: '20000mAh Power Bank',
-                price: 49.99,
-                category: 'accessories',
-                image: 'https://images.unsplash.com/photo-1609592810795-13b00c18b1a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-                description: 'High-capacity power bank with fast charging technology for all your devices.',
-                rating: 4.3,
-                reviewCount: 445,
-                badge: 'Essential'
-            },
-            {
-                id: 'p6',
-                name: 'Fast Wireless Charger',
-                price: 39.99,
-                originalPrice: 59.99,
-                category: 'accessories',
-                image: 'https://images.unsplash.com/photo-1609592810795-13b00c18b1a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-                description: 'Qi-compatible wireless charger with fast charging capability for all compatible devices.',
-                rating: 4.2,
-                reviewCount: 321,
-                badge: 'Sale'
-            }
-        ];
-
-        // Use ShoppingCart class for cart functionality
-        function addToCart(product) {
-            cart.addToCart(product);
-            updateCartCount();
-            showNotification(`${product.name} added to cart!`);
+        if (categorySelect.value !== 'all') {
+          result = result.filter(p => p.category === categorySelect.value);
         }
 
-        function updateCartCount() {
-            const cartCount = document.querySelector('.cart-count');
-            if (cartCount) {
-                const totalItems = cart.getCart().reduce((total, item) => total + item.quantity, 0);
-                cartCount.textContent = totalItems;
-            }
+        switch (sortSelect.value) {
+          case 'price-low':
+            result.sort((a, b) => a.price - b.price);
+            break;
+          case 'price-high':
+            result.sort((a, b) => b.price - a.price);
+            break;
+          case 'name':
+            result.sort((a, b) => a.name.localeCompare(b.name));
+            break;
         }
 
-        // Wishlist simulation (local only)
-        let wishlist = [];
+        loadProducts(result);
+      };
 
-        function loadProducts(filteredProducts = products) {
-            const grid = document.getElementById('products-grid');
-            
-            if (filteredProducts.length === 0) {
-                grid.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-search"></i>
-                        <h3>No products found</h3>
-                        <p>Try adjusting your filters or search terms</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            grid.innerHTML = '';
+      categorySelect.addEventListener('change', applyFilters);
+      sortSelect.addEventListener('change', applyFilters);
+    }
 
-            filteredProducts.forEach((product, index) => {
-                const card = document.createElement('div');
-                card.className = 'product-card animate-fade-in';
-                card.style.animationDelay = `${index * 0.1}s`;
-                
-                const discount = product.originalPrice ? 
-                    Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100) : 0;
-                
-                const stars = generateStarRating(product.rating);
-                
-                card.innerHTML = `
-                    <div class="product-image-container">
-                        <img src="${product.image}" alt="${product.name}" class="product-image">
-                        ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
-                        <button class="wishlist-btn ${wishlist.includes(product.id) ? 'active' : ''}" 
-                                onclick="toggleWishlist('${product.id}')">
-                            <i class="fas fa-heart"></i>
-                        </button>
-                        <div class="quick-view">
-                            <button class="quick-view-btn" onclick="quickView('${product.id}')">
-                                <i class="fas fa-eye"></i> Quick View
-                            </button>
-                        </div>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">${product.name}</h3>
-                        <p class="product-description">${product.description}</p>
-                        
-                        <div class="product-price-container">
-                            <span class="product-price">$${product.price.toFixed(2)}</span>
-                            ${product.originalPrice ? `
-                                <span class="original-price">$${product.originalPrice.toFixed(2)}</span>
-                                <span class="discount">-${discount}%</span>
-                            ` : ''}
-                        </div>
-                        
-                        <div class="product-meta">
-                            <span class="product-category">${product.category}</span>
-                            <div class="rating">
-                                <div class="rating-stars">
-                                    ${stars}
-                                </div>
-                                <span class="rating-count">(${product.reviewCount})</span>
-                            </div>
-                        </div>
-                        
-                        <div class="product-actions">
-                            <a href="product-details.html?id=${product.id}" class="btn btn-secondary">
-                                <i class="fas fa-eye"></i> Details
-                            </a>
-                            <button class="btn btn-primary" onclick="addToCart(${JSON.stringify(product).replace(/"/g, '&quot;')})">
-                                <i class="fas fa-cart-plus"></i> Add to Cart
-                            </button>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-        }
+    // === Cart Integration ===
+    function addToCart(product) {
+      cart.addToCart(product);
+      showNotification(`${product.name} added to your cart.`);
+    }
 
-        function generateStarRating(rating) {
-            const fullStars = Math.floor(rating);
-            const halfStar = rating % 1 >= 0.5;
-            const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-            
-            let stars = '';
-            
-            // Full stars
-            for (let i = 0; i < fullStars; i++) {
-                stars += '<i class="fas fa-star"></i>';
-            }
-            
-            // Half star
-            if (halfStar) {
-                stars += '<i class="fas fa-star-half-alt"></i>';
-            }
-            
-            // Empty stars
-            for (let i = 0; i < emptyStars; i++) {
-                stars += '<i class="far fa-star"></i>';
-            }
-            
-            return stars;
-        }
+    // === Notification Message ===
+    function showNotification(msg) {
+      const note = document.createElement('div');
+      note.className = 'notification';
+      note.textContent = msg;
+      document.body.appendChild(note);
 
-        function setupFilters() {
-            const categoryFilter = document.getElementById('category-filter');
-            const sortFilter = document.getElementById('sort-filter');
+      setTimeout(() => note.classList.add('show'), 100);
 
-            function applyFilters() {
-                let filtered = [...products];
-
-                // Apply category filter
-                if (categoryFilter.value !== 'all') {
-                    filtered = filtered.filter(
-                        product => product.category === categoryFilter.value
-                    );
-                }
-
-                // Apply sort filter
-                switch (sortFilter.value) {
-                    case 'price-low':
-                        filtered.sort((a, b) => a.price - b.price);
-                        break;
-                    case 'price-high':
-                        filtered.sort((a, b) => b.price - a.price);
-                        break;
-                    case 'name':
-                        filtered.sort((a, b) => a.name.localeCompare(b.name));
-                        break;
-                }
-
-                loadProducts(filtered);
-            }
-
-            categoryFilter.addEventListener('change', applyFilters);
-            sortFilter.addEventListener('change', applyFilters);
-        }
-
-        function setupFilterTags() {
-            const filterTags = document.querySelectorAll('.filter-tag');
-            const categoryFilter = document.getElementById('category-filter');
-            
-            filterTags.forEach(tag => {
-                tag.addEventListener('click', () => {
-                    // Remove active class from all tags
-                    filterTags.forEach(t => t.classList.remove('active'));
-                    // Add active class to clicked tag
-                    tag.classList.add('active');
-                    
-                    // Update category filter
-                    const category = tag.dataset.category;
-                    categoryFilter.value = category;
-                    
-                    // Apply filters
-                    let filtered = [...products];
-                    
-                    if (category !== 'all') {
-                        filtered = filtered.filter(product => product.category === category);
-                    }
-                    
-                    loadProducts(filtered);
-                });
-            });
-        }
-
-        function setupSearch() {
-            const searchInput = document.getElementById('search-input');
-            
-            searchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                
-                if (searchTerm.length === 0) {
-                    loadProducts(products);
-                    return;
-                }
-                
-                const filtered = products.filter(product => 
-                    product.name.toLowerCase().includes(searchTerm) || 
-                    product.description.toLowerCase().includes(searchTerm) ||
-                    product.category.toLowerCase().includes(searchTerm)
-                );
-                
-                loadProducts(filtered);
-            });
-        }
-
-        function toggleWishlist(productId) {
-            const index = wishlist.indexOf(productId);
-            if (index === -1) {
-                wishlist.push(productId);
-                showNotification('Product added to wishlist!');
-            } else {
-                wishlist.splice(index, 1);
-                showNotification('Product removed from wishlist!');
-            }
-            
-            // Update UI
-            const wishlistBtn = document.querySelector(`.wishlist-btn[onclick="toggleWishlist('${productId}')"]`);
-            if (wishlistBtn) {
-                wishlistBtn.classList.toggle('active');
-            }
-        }
-
-        function quickView(productId) {
-            const product = products.find(p => p.id === productId);
-            if (product) {
-                showNotification(`Quick view: ${product.name}`);
-            }
-        }
-
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification animate-slide-in';
-            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 3000);
-        }
-    </script>
+      setTimeout(() => {
+        note.classList.remove('show');
+        setTimeout(() => note.remove(), 300);
+      }, 3000);
+    }
+  </script>
 </body>
 </html>

@@ -1,477 +1,205 @@
 class ActivityTracker {
+
     constructor() {
-        this.storageKey = 'activity-tracker-data';
-        this.sessionId = this.generateSessionId();
-        this.sessionStart = Date.now();
-        this.events = [];
-        this.stats = {
-            pagesViewed: 0,
-            totalClicks: 0,
-            formsSubmitted: 0
-        };
+        // constants
+        this.KEY = 'activity-tracker-data';
+        this.SESSION_LIMIT = 60 * 60 * 1000; // 1 hr
 
-        this.init();
+        this._initSession();
+        this._renderWidget();
+        this._recordPageView();
+        this._attachListeners();
+        this._startDurationClock();
     }
 
-    generateSessionId() {
-        return `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    }
+    // ---------------------- SESSION SETUP ----------------------
+    _initSession() {
+        const saved = localStorage.getItem(this.KEY);
+        const now = Date.now();
 
-    init() {
-        this.loadFromStorage();
-        this.setupEventListeners();
-        this.trackPageView();
-        this.render();
-        this.startDurationTimer();
-    }
-
-    loadFromStorage() {
-        const stored = localStorage.getItem(this.storageKey);
-        if (stored) {
+        if (saved) {
             try {
-                const data = JSON.parse(stored);
+                const data = JSON.parse(saved);
+                const lastEvent = data.events.length
+                    ? Math.max(...data.events.map(e => e.time))
+                    : data.startedAt;
 
-                const lastActivity = (data.events && data.events.length > 0) ?
-                    Math.max(...data.events.map(e => e.time)) : data.sessionStart || 0;
-                const timeSinceLastActivity = Date.now() - lastActivity;
-
-                // Continue session if within 1 hour (3600000 ms)
-                if (timeSinceLastActivity < 3600000) {
-                    this.sessionId = data.sessionId || this.sessionId;
-                    this.sessionStart = data.sessionStart || this.sessionStart;
-                    this.events = data.events || [];
-                    this.stats = Object.assign({
-                        pagesViewed: 0,
-                        totalClicks: 0,
-                        formsSubmitted: 0
-                    }, data.stats || {});
-                } else {
-                    // Session expired -> create a new session (reset events/stats)
-                    this.sessionId = this.generateSessionId();
-                    this.sessionStart = Date.now();
-                    this.events = [];
-                    this.stats = {
-                        pagesViewed: 0,
-                        totalClicks: 0,
-                        formsSubmitted: 0
-                    };
-                    this.saveToStorage();
+                // reuse session if still active
+                if (now - lastEvent < this.SESSION_LIMIT) {
+                    this.session = data;
+                    return;
                 }
-            } catch (e) {
-                console.error('Failed to load stored data:', e);
-                // If stored data corrupt, reset
-                this.sessionId = this.generateSessionId();
-                this.sessionStart = Date.now();
-                this.events = [];
-                this.stats = {
-                    pagesViewed: 0,
-                    totalClicks: 0,
-                    formsSubmitted: 0
-                };
-                this.saveToStorage();
+            } catch (err) {
+                console.warn('Could not load existing session', err);
             }
-        } else {
-            // No stored data -> save initial session
-            this.saveToStorage();
         }
-    }
 
-    saveToStorage() {
-        const data = {
-            sessionId: this.sessionId,
-            sessionStart: this.sessionStart,
-            events: this.events,
-            stats: this.stats
+        // create new session
+        this.session = {
+            sessionId: this._generateId(),
+            startedAt: now,
+            events: []
         };
-        try {
-            localStorage.setItem(this.storageKey, JSON.stringify(data));
-        } catch (err) {
-            console.error('Failed to save activity tracker data to localStorage:', err);
-        }
+        this._save();
     }
 
-    setupEventListeners() {
-    // Click tracking
-    document.addEventListener('click', (e) => {
-        const timelineBtn = e.target.closest('.activity-tracker-button'); 
-        if (timelineBtn) { this.toggleTimeline(); return; }
+    _generateId() {
+        const t = Date.now();
+        const r = Math.random().toString(36).substring(2, 7);
+        return `session_${t}_${r}`;
+    }
 
-        const primary = e.target.closest('.btn-primary'); 
-        if (primary) { this.trackButtonClick(); return; }
-    });
+    _save() {
+        localStorage.setItem(this.KEY, JSON.stringify(this.session));
+    }
 
-    // Form submission tracking
-    document.addEventListener('submit', (e) => {
-        this.trackFormSubmission({ formName: (e.target.name || e.target.id) || 'form' });
-    });
+    // ---------------------- TIME HELPERS ----------------------
+    _formatTime(ts) {
+        const d = new Date(ts);
+        return [
+            String(d.getHours()).padStart(2, '0'),
+            String(d.getMinutes()).padStart(2, '0'),
+            String(d.getSeconds()).padStart(2, '0')
+        ].join(':');
+    }
 
-    // Scroll tracking (debounced)
-    let scrollTimeout;
-    window.addEventListener('scroll', () => {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => this.updateScrollDepth(), 100);
-    });
+    _sessionMinutes() {
+        return Math.floor((Date.now() - this.session.startedAt) / 60000);
+    }
 
-    // Final scroll update on page unload
-    window.addEventListener('beforeunload', () => this.updateScrollDepth(true));
-}
+    // ---------------------- EVENT LOGGING ----------------------
+    _recordPageView() {
+        const page = window.location.pathname.split('/').pop() || 'index.html';
+        this._logEvent('pageview', `Visited ${page}`, page);
+    }
 
+    _logEvent(type, details, page = null) {
+        const entry = {
+            type,
+            details,
+            time: Date.now()
+        };
+        if (page) entry.page = page;
+        this.session.events.push(entry);
+        this._save();
+        this._updateUI();
+    }
 
-    /*setupEventListeners() {
-    // 1️⃣ Single delegated click listener high on the document
-    document.addEventListener('click', (e) => {
-        // Timeline panel button clicked? Toggle timeline and skip tracking
-        const timelineBtn = e.target.closest('.activity-tracker-button');
-        if (timelineBtn) {
-            this.toggleTimeline();
-            return;
-        }
-
-        // 2️⃣ Track any clickable element
-        const target = e.target.closest(
-            'button, a, select, [onclick], .filter-tag, .btn, .cta, .card, [role="button"]'
-        );
-
-        if (target) {
-            // Get a readable label
-            let label = target.textContent.trim() || 
-                        target.getAttribute('aria-label') || 
-                        target.getAttribute('id') || 
-                        'Unknown Clickable';
-
-            // Special case: filter tags
-            if (target.classList.contains('filter-tag')) {
-                label = `Filter tag clicked: ${label}`;
+    _attachListeners() {
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('btn-primary')) {
+                this._logEvent('interaction', 'Clicked primary button');
             }
+            if (e.target.classList.contains('activity-tracker-button')) {
+                this._toggleTimeline();
+            }
+        }, true);
 
-            this.trackButtonClick(label);
-        }
-    });
-
-    // 3️⃣ Capture dropdown changes (select elements)
-    document.addEventListener('change', (e) => {
-        const target = e.target.closest('select');
-        if (target) {
-            const label = target.previousElementSibling?.textContent.trim() || target.id || 'Dropdown';
-            const selectedOption = target.options[target.selectedIndex].textContent.trim();
-            this.trackButtonClick(`${label} changed to: ${selectedOption}`);
-        }
-    });
-
-    // 4️⃣ Track form submissions
-    document.addEventListener('submit', (e) => {
-        this.trackFormSubmission({
-            formName: (e.target && (e.target.name || e.target.id)) || 'form'
-        });
-    });
-
-    // 5️⃣ Track scroll for page view updates (debounced)
-    let scrollTimeout;
-    window.addEventListener('scroll', () => {
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            this.updateScrollDepth();
-        }, 100);
-    });
-}*/
-
-
-
-    trackPageView() {
-        const pageName = document.title || window.location.pathname.split('/').pop() || 'index.html';
-        const scrollDepth = this.calculateScrollDepth();
-
-        const ev = {
-            type: 'pageview',
-            page: pageName,
-            time: Date.now(),
-            scrollDepth: scrollDepth
-        };
-        this.events.push(ev);
-        this.stats.pagesViewed++;
-        this.saveToStorage();
-        this.render();
+        document.addEventListener('submit', () => {
+            this._logEvent('interaction', 'Form submitted');
+        }, true);
     }
 
-
-    updateScrollDepth(force = false) {
-    const pageName = document.title || window.location.pathname.split('/').pop() || 'index.html';
-    const scrollDepth = this.calculateScrollDepth();
-
-    const pageView = this.events.find(event =>
-        event.type === 'pageview' && event.page === pageName
-    );
-
-    if (!pageView) return;
-
-    // Only update if new depth is higher, or if forced (unload)
-    if (force || scrollDepth > pageView.scrollDepth) {
-        pageView.scrollDepth = scrollDepth;
-        this.saveToStorage();
-        this.render();
-    }
-}
-
-
-    trackButtonClick(label = 'Unknown Clickable') {
-        this.events.push({
-            type: 'interaction',
-            subtype: 'button-click',
-            details: label,   // store the actual clicked element's label
-            time: Date.now()
-        });
-
-        this.stats.totalClicks++;
-        this.saveToStorage();
-        this.render();
+    // ---------------------- WIDGET UI ----------------------
+    _renderWidget() {
+        const html = `
+            <div class="activity-tracker-widget">
+                <button class="activity-tracker-button" title="View activity">🕒</button>
+                <aside class="activity-tracker-timeline">
+                    ${this._renderHeader()}
+                    ${this._renderStats()}
+                    ${this._renderTimeline()}
+                </aside>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', html);
     }
 
-    trackFormSubmission(opts = {}) {
-        const details = opts.formName ? `Form submitted (${opts.formName})` : 'Form submitted';
-        this.events.push({
-            type: 'interaction',
-            subtype: 'form-submission',
-            details: details,
-            time: Date.now()
-        });
-
-        this.stats.formsSubmitted++;
-        this.saveToStorage();
-        this.render();
-    }
-
-    calculateScrollDepth() {
-    const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
-    const scrollHeight = Math.max(
-        document.body.scrollHeight,
-        document.documentElement.scrollHeight,
-        document.body.offsetHeight,
-        document.documentElement.offsetHeight
-    );
-    const clientHeight = window.innerHeight || document.documentElement.clientHeight || 0;
-
-    if (scrollHeight <= clientHeight) return 100; // fully visible
-
-    const scrollPercent = (scrollTop / (scrollHeight - clientHeight)) * 100;
-
-    return Math.min(Math.max(scrollPercent, 0), 100); // clamp between 0 and 100
-}
-
-
-    formatTime(timestamp) {
-        const date = new Date(timestamp);
-        return date.toLocaleTimeString('en-GB', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
-        });
-    }
-
-    getSessionDuration() {
-        const duration = Date.now() - this.sessionStart;
-        return Math.floor(duration / 60000); // minutes
-    }
-
-    startDurationTimer() {
-        // Update stats every minute to reflect duration
-        this._durationInterval = setInterval(() => {
-            this.renderStats();
-        }, 60000);
-    }
-
-    toggleTimeline() {
-        const timeline = document.querySelector('.activity-tracker-timeline');
-        if (timeline) {
-            timeline.classList.toggle('expanded');
-        }
-    }
-
-    render() {
-        this.ensureWidgetExists();
-        this.renderHeader();
-        this.renderStats();
-        this.renderTimeline();
-    }
-
-    ensureWidgetExists() {
-        let widget = document.querySelector('.activity-tracker-widget');
-        if (!widget) {
-            widget = document.createElement('div');
-            widget.className = 'activity-tracker-widget';
-            document.body.appendChild(widget);
-        }
-
-        let button = widget.querySelector('.activity-tracker-button');
-        if (!button) {
-            button = document.createElement('button');
-            button.className = 'activity-tracker-button';
-            button.setAttribute('aria-label', 'Open activity timeline');
-            button.innerHTML = '🕒';
-            widget.appendChild(button);
-        }
-
-        let timeline = widget.querySelector('.activity-tracker-timeline');
-        if (!timeline) {
-            timeline = document.createElement('aside');
-            timeline.className = 'activity-tracker-timeline';
-            widget.appendChild(timeline);
-        }
-
-        this.ensureTimelineStructure(timeline);
-    }
-
-    ensureTimelineStructure(timeline) {
-        // Header
-        let header = timeline.querySelector('.timeline-header');
-        if (!header) {
-            header = document.createElement('header');
-            header.className = 'timeline-header';
-            timeline.appendChild(header);
-        }
-
-        if (!header.querySelector('h3')) {
-            header.innerHTML = `
+    _renderHeader() {
+        const s = this.session;
+        return `
+            <header class="timeline-header">
                 <h3>Activity Timeline</h3>
                 <div>
-                    <div class="session-id">Session ID: ${this.sessionId}</div>
-                    <div class="session-started">Started: ${this.formatTime(this.sessionStart)}</div>
+                    <div><strong>ID:</strong> ${s.sessionId}</div>
+                    <div><strong>Start:</strong> ${this._formatTime(s.startedAt)}</div>
                 </div>
-            `;
-        }
-
-        // Stats container
-        let stats = timeline.querySelector('.session-stats');
-        if (!stats) {
-            stats = document.createElement('section');
-            stats.className = 'session-stats';
-            timeline.appendChild(stats);
-        }
-
-        // Timeline content
-        let content = timeline.querySelector('.timeline-content');
-        if (!content) {
-            content = document.createElement('div');
-            content.className = 'timeline-content';
-            // enforce required CSS properties
-            content.style.overflowY = 'auto';
-            content.style.maxHeight = '350px';
-            timeline.appendChild(content);
-        } else {
-            // ensure styles exist in case element already present
-            content.style.overflowY = 'auto';
-            content.style.maxHeight = '350px';
-        }
-
-        let wrapper = content.querySelector('.timeline-wrapper');
-        if (!wrapper) {
-            wrapper = document.createElement('div');
-            wrapper.className = 'timeline-wrapper';
-            content.appendChild(wrapper);
-        }
+            </header>
+        `;
     }
 
-    renderHeader() {
-        const sessionIdEl = document.querySelector('.session-id');
-        const sessionStartedEl = document.querySelector('.session-started');
-
-        if (sessionIdEl) {
-            sessionIdEl.textContent = `Session ID: ${this.sessionId}`;
-        }
-
-        if (sessionStartedEl) {
-            sessionStartedEl.textContent = `Started: ${this.formatTime(this.sessionStart)}`;
-        }
+    _renderStats() {
+        const { duration, pages, clicks, forms } = this._getStats();
+        return `
+            <section class="session-stats">
+                <div class="stat"><div class="stat-label">Duration</div><div class="stat-value">${duration} min</div></div>
+                <div class="stat"><div class="stat-label">Pages Viewed</div><div class="stat-value">${pages}</div></div>
+                <div class="stat"><div class="stat-label">Clicks</div><div class="stat-value">${clicks}</div></div>
+                <div class="stat"><div class="stat-label">Forms</div><div class="stat-value">${forms}</div></div>
+            </section>
+        `;
     }
 
-    renderStats() {
-        const statsContainer = document.querySelector('.session-stats');
-        if (!statsContainer) return;
+    _getStats() {
+        const events = this.session.events;
+        return {
+            duration: this._sessionMinutes(),
+            pages: events.filter(e => e.type === 'pageview').length,
+            clicks: events.filter(e => e.type === 'interaction' && e.details.includes('Click')).length,
+            forms: events.filter(e => e.type === 'interaction' && e.details.includes('Form')).length
+        };
+    }
 
-        // Render exactly in the specified order and format:
-        statsContainer.innerHTML = `
-            <div class="stat">
-                <div class="stat-label">Session Duration</div>
-                <div class="stat-value">${this.getSessionDuration()} min</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Pages Viewed</div>
-                <div class="stat-value">${this.stats.pagesViewed}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Total Clicks</div>
-                <div class="stat-value">${this.stats.totalClicks}</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Forms Submitted</div>
-                <div class="stat-value">${this.stats.formsSubmitted}</div>
+    _renderTimeline() {
+        const items = this.session.events.map(ev => this._renderItem(ev)).join('');
+        return `
+            <div class="timeline-content">
+                <div class="timeline-wrapper">
+                    ${items}
+                </div>
             </div>
         `;
     }
 
-    renderTimeline() {
-        const timelineWrapper = document.querySelector('.timeline-wrapper');
-        if (!timelineWrapper) return;
-
-        // Sort events by time (newest first)
-        const sortedEvents = [...this.events].sort((a, b) => b.time - a.time);
-
-        timelineWrapper.innerHTML = sortedEvents.map(event => {
-            const time = this.formatTime(event.time);
-
-            if (event.type === 'pageview') {
-                return `
-                    <div class="timeline-item pageview">
-                        <div class="time">${time}</div>
-                        <div class="event-content">
-                            <div class="event-title">Page View</div>
-                            <div class="event-details">Visited: ${event.page} — ${event.scrollDepth}% viewed</div>
-                        </div>
-                    </div>
-                `;
-            } else if (event.type === 'interaction') {
-                return `
-                    <div class="timeline-item interaction">
-                        <div class="time">${time}</div>
-                        <div class="event-content">
-                            <div class="event-title">Interaction</div>
-                            <div class="event-details">${event.details}</div>
-                        </div>
-                    </div>
-                `;
-            }
-            return '';
-        }).join('');
+    _renderItem(ev) {
+        const cls = ev.type === 'pageview' ? 'pageview' : 'interaction';
+        const label = ev.type === 'pageview' ? 'Page View' : 'Interaction';
+        return `
+            <div class="timeline-item ${cls}">
+                <div class="time">${this._formatTime(ev.time)}</div>
+                <div class="event-title">${label}</div>
+                <div class="event-details">${ev.details}</div>
+            </div>
+        `;
     }
 
-    // Public method to track custom interactions
-    trackInteraction(details) {
-        this.events.push({
-            type: 'interaction',
-            subtype: 'custom',
-            details: details,
-            time: Date.now()
-        });
-        this.saveToStorage();
-        this.render();
+    _toggleTimeline() {
+        const tl = document.querySelector('.activity-tracker-timeline');
+        if (tl) tl.classList.toggle('expanded');
     }
 
-    // Public method to get current session data
-    getSessionData() {
-        return {
-            sessionId: this.sessionId,
-            sessionStart: this.sessionStart,
-            events: this.events,
-            stats: this.stats
-        };
+    _updateUI() {
+        const stats = document.querySelector('.session-stats');
+        const wrap = document.querySelector('.timeline-wrapper');
+        if (stats) stats.innerHTML = this._renderStats().replace(/<\/?section.*?>/g, '');
+        if (wrap) wrap.innerHTML = this.session.events.map(e => this._renderItem(e)).join('');
+    }
+
+    // ---------------------- DURATION TIMER ----------------------
+    _startDurationClock() {
+        setInterval(() => {
+            const el = document.querySelector('.stat-value');
+            if (el) el.textContent = `${this._sessionMinutes()} min`;
+        }, 1000);
     }
 }
 
-// Initialize the activity tracker when DOM is loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.activityTracker = new ActivityTracker();
-    });
+// Node/Browser compatibility
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = ActivityTracker;
 } else {
-    window.activityTracker = new ActivityTracker();
+    window.ActivityTracker = ActivityTracker;
 }
+
+// Initialize when ready
+document.addEventListener('DOMContentLoaded', () => new ActivityTracker());

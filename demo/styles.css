@@ -391,3 +391,145 @@ nav{
   from{opacity:0;}
   to{opacity:1;}
 }
+
+
+/* ==============================
+   Footer Styles
+   ============================== */
+
+.footer {
+    background: #1a1a1a;
+    color: #f1f1f1;
+    padding: 60px 22px 20px;
+    font-family: "Poppins", sans-serif;
+}
+
+.footer-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+    max-width: 1180px;
+    margin: 0 auto;
+}
+
+.footer-left h3 {
+    font-size: 1.6rem;
+    color: #00a8ff;
+    margin-bottom: 12px;
+}
+
+.footer-left p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.85;
+}
+
+.footer-center h4,
+.footer-right h4 {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.footer-center ul {
+    list-style: none;
+}
+
+.footer-center ul li {
+    margin-bottom: 8px;
+}
+
+.footer-center ul li a {
+    text-decoration: none;
+    color: #f1f1f1;
+    transition: color 0.3s ease;
+}
+
+.footer-center ul li a:hover {
+    color: #00a8ff;
+}
+
+.footer-right .social-icons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.footer-right .social-icons a {
+    color: #f1f1f1;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.footer-right .social-icons a:hover {
+    color: #00a8ff;
+    transform: scale(1.1);
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.newsletter-form input[type="email"] {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    flex: 1;
+    font-size: 0.95rem;
+}
+
+.newsletter-form button {
+    padding: 8px 12px;
+    border-radius: 5px;
+    border: none;
+    background: #00a8ff;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.newsletter-form button:hover {
+    background: #007bbf;
+    transform: scale(1.05);
+}
+
+.footer-bottom {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.85rem;
+    opacity: 0.7;
+    border-top: 1px solid #333;
+    padding-top: 12px;
+}
+
+/* Responsive Footer */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 30px;
+    }
+
+    .footer-center ul li {
+        display: inline-block;
+        margin: 0 10px 8px 10px;
+    }
+
+    .newsletter-form {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .newsletter-form input[type="email"] {
+        width: 100%;
+    }
+
+    .newsletter-form button {
+        width: 100%;
+    }
+}

@@ -3,23 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Patel — Home</title>
+  <title>Patel Tech Store</title>
 
-  <!-- core styles -->
+  <!-- Core Styles -->
   <link href="../timeline-styles.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
+  <!-- Google Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body>
+  <!-- Header / Navigation -->
   <header>
     <nav>
       <div class="container nav-container">
         <a class="logo" href="index.html">Patel</a>
-
         <div class="nav-links">
           <a href="index.html">Home</a>
           <a href="products.html">Products</a>
-          <a class="cart-icon" href="cart.html">Cart
+          <a href="about.html">About</a>
+          <a class="cart-icon" href="cart.html">
+            <i class="fa fa-shopping-cart"></i>
             <span class="cart-count">0</span>
           </a>
         </div>
@@ -27,25 +32,30 @@
     </nav>
   </header>
 
+  <!-- Hero Section -->
   <section class="hero">
-    <div class="container">
-      <h1>Shop the Best Tech</h1>
-      <p>Handpicked gadgets and accessories — value and quality you can trust.</p>
-
-      <a class="btn btn-primary" href="products.html">Browse Products</a>
+    <div class="container hero-content">
+      <h1>Discover Premium Tech</h1>
+      <p>Exclusive gadgets and accessories curated for performance and style.</p>
+      <a class="btn btn-primary" href="products.html">Shop Now</a>
     </div>
   </section>
 
+  <!-- Featured Products -->
   <main class="container">
-
     <section class="featured-products">
-      <h2>Spotlight</h2>
+      <div class="section-header">
+        <h2>Featured Products</h2>
+        <p>Our top picks this season — hand-selected for quality and value.</p>
+      </div>
 
       <div class="products-grid">
 
-        <!-- product 1 -->
+        <!-- Product Card 1 -->
         <article class="product-card">
-          <img alt="Premium Wireless Headphones" class="product-image" src="https://prd.place/400">
+          <div class="product-image-wrapper">
+            <img src="https://prd.place/400" alt="Premium Wireless Headphones" class="product-image">
+          </div>
           <div class="product-info">
             <h3 class="product-title">Premium Wireless Headphones</h3>
             <p class="product-price">$199.99</p>
@@ -53,23 +63,27 @@
           </div>
         </article>
 
-        <!-- product 2 -->
+        <!-- Product Card 2 -->
         <article class="product-card">
-          <img src="https://prd.place/401" alt="Smart Fitness Watch" class="product-image">
+          <div class="product-image-wrapper">
+            <img src="https://prd.place/401" alt="Smart Fitness Watch" class="product-image">
+          </div>
           <div class="product-info">
             <h3 class="product-title">Smart Fitness Watch</h3>
             <p class="product-price">$149.99</p>
-            <a class="btn btn-primary" href="product1.html">View Details</a>
+            <a href="product2.html" class="btn btn-primary">View Details</a>
           </div>
         </article>
 
-        <!-- product 3 -->
+        <!-- Product Card 3 -->
         <article class="product-card">
-          <img class="product-image" src="https://prd.place/402" alt="Portable Bluetooth Speaker">
+          <div class="product-image-wrapper">
+            <img src="https://prd.place/402" alt="Portable Bluetooth Speaker" class="product-image">
+          </div>
           <div class="product-info">
             <h3 class="product-title">Portable Bluetooth Speaker</h3>
             <p class="product-price">$79.99</p>
-            <a href="product1.html" class="btn btn-primary">View Details</a>
+            <a href="product3.html" class="btn btn-primary">View Details</a>
           </div>
         </article>
 
@@ -77,9 +91,41 @@
     </section>
   </main>
 
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-left">
+        <h3>Patel Tech Store</h3>
+        <p>Premium gadgets and accessories for tech enthusiasts worldwide.</p>
+      </div>
+      <div class="footer-center">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Products</a></li>
+        </ul>
+      </div>
+      <div class="footer-right">
+        <h4>Follow Us</h4>
+        <div class="social-icons">
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <h4>Subscribe</h4>
+        <form class="newsletter-form">
+          <input type="email" placeholder="Your email" required>
+          <button type="submit"><i class="fa fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Patel Tech Store. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
   <script src="../activity-tracker.js"></script>
   <script src="cart.js"></script>
-
-
 </body>
 </html>

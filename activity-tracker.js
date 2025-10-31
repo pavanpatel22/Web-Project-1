@@ -5,15 +5,15 @@ class ActivityTracker {
         this.KEY = 'activity-tracker-data';
         this.SESSION_LIMIT = 60 * 60 * 1000; // 1 hr
 
-        this._initSession();
-        this._renderWidget();
+        this._startSession();
+        this._displayWidget();
         this._recordPageView();
         this._attachListeners();
-        this._startDurationClock();
+        this._updateSessionDuration();
     }
 
     // ---------------------- SESSION SETUP ----------------------
-    _initSession() {
+    _startSession() {
         const saved = localStorage.getItem(this.KEY);
         const now = Date.now();
 
@@ -36,25 +36,25 @@ class ActivityTracker {
 
         // create new session
         this.session = {
-            sessionId: this._generateId(),
+            sessionId: this._createSessionId(),
             startedAt: now,
             events: []
         };
-        this._save();
+        this._persistSession();
     }
 
-    _generateId() {
+    _createSessionId() {
         const t = Date.now();
         const r = Math.random().toString(36).substring(2, 7);
         return `session_${t}_${r}`;
     }
 
-    _save() {
+    _persistSession() {
         localStorage.setItem(this.KEY, JSON.stringify(this.session));
     }
 
     // ---------------------- TIME HELPERS ----------------------
-    _formatTime(ts) {
+    _getFormattedTime(ts) {
         const d = new Date(ts);
         return [
             String(d.getHours()).padStart(2, '0'),
@@ -81,17 +81,17 @@ class ActivityTracker {
         };
         if (page) entry.page = page;
         this.session.events.push(entry);
-        this._save();
+        this._persistSession();
         this._updateUI();
     }
 
     _attachListeners() {
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('btn-primary')) {
-                this._logEvent('interaction', 'Clicked primary button');
+                this._logEvent('interaction', 'Clicked link: Shop Now');
             }
             if (e.target.classList.contains('activity-tracker-button')) {
-                this._toggleTimeline();
+                this._expandCollapseTimeline();
             }
         }, true);
 
@@ -101,35 +101,35 @@ class ActivityTracker {
     }
 
     // ---------------------- WIDGET UI ----------------------
-    _renderWidget() {
+    _displayWidget() {
         const html = `
             <div class="activity-tracker-widget">
                 <button class="activity-tracker-button" title="View activity">🕒</button>
                 <aside class="activity-tracker-timeline">
-                    ${this._renderHeader()}
-                    ${this._renderStats()}
-                    ${this._renderTimeline()}
+                    ${this._displayHeader()}
+                    ${this._displayStats()}
+                    ${this._displayTimeline()}
                 </aside>
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', html);
     }
 
-    _renderHeader() {
+    _displayHeader() {
         const s = this.session;
         return `
             <header class="timeline-header">
                 <h3>Activity Timeline</h3>
                 <div>
                     <div><strong>ID:</strong> ${s.sessionId}</div>
-                    <div><strong>Start:</strong> ${this._formatTime(s.startedAt)}</div>
+                    <div><strong>Start:</strong> ${this._getFormattedTime(s.startedAt)}</div>
                 </div>
             </header>
         `;
     }
 
-    _renderStats() {
-        const { duration, pages, clicks, forms } = this._getStats();
+    _displayStats() {
+        const { duration, pages, clicks, forms } = this._calculateStats();
         return `
             <section class="session-stats">
                 <div class="stat"><div class="stat-label">Duration</div><div class="stat-value">${duration} min</div></div>
@@ -140,7 +140,7 @@ class ActivityTracker {
         `;
     }
 
-    _getStats() {
+    _calculateStats() {
         const events = this.session.events;
         return {
             duration: this._sessionMinutes(),
@@ -150,8 +150,8 @@ class ActivityTracker {
         };
     }
 
-    _renderTimeline() {
-        const items = this.session.events.map(ev => this._renderItem(ev)).join('');
+    _displayTimeline() {
+        const items = this.session.events.map(ev => this._formatTimelineEvent(ev)).join('');
         return `
             <div class="timeline-content">
                 <div class="timeline-wrapper">
@@ -161,19 +161,19 @@ class ActivityTracker {
         `;
     }
 
-    _renderItem(ev) {
+    _formatTimelineEvent(ev) {
         const cls = ev.type === 'pageview' ? 'pageview' : 'interaction';
         const label = ev.type === 'pageview' ? 'Page View' : 'Interaction';
         return `
             <div class="timeline-item ${cls}">
-                <div class="time">${this._formatTime(ev.time)}</div>
+                <div class="time">${this._getFormattedTime(ev.time)}</div>
                 <div class="event-title">${label}</div>
                 <div class="event-details">${ev.details}</div>
             </div>
         `;
     }
 
-    _toggleTimeline() {
+    _expandCollapseTimeline() {
         const tl = document.querySelector('.activity-tracker-timeline');
         if (tl) tl.classList.toggle('expanded');
     }
@@ -181,12 +181,12 @@ class ActivityTracker {
     _updateUI() {
         const stats = document.querySelector('.session-stats');
         const wrap = document.querySelector('.timeline-wrapper');
-        if (stats) stats.innerHTML = this._renderStats().replace(/<\/?section.*?>/g, '');
-        if (wrap) wrap.innerHTML = this.session.events.map(e => this._renderItem(e)).join('');
+        if (stats) stats.innerHTML = this._displayStats().replace(/<\/?section.*?>/g, '');
+        if (wrap) wrap.innerHTML = this.session.events.map(e => this._formatTimelineEvent(e)).join('');
     }
 
     // ---------------------- DURATION TIMER ----------------------
-    _startDurationClock() {
+    _updateSessionDuration() {
         setInterval(() => {
             const el = document.querySelector('.stat-value');
             if (el) el.textContent = `${this._sessionMinutes()} min`;

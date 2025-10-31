@@ -96,9 +96,9 @@ class ShoppingCart {
         }
     }
 
-    // Update the visual cart count element (.cart-count) if present
+    // Update the visual cart count element (.bag_count) if present
     updateCartCount() {
-        const el = document.querySelector('.cart-count');
+        const el = document.querySelector('.bag_count');
         if (!el) return;
 
         const totalItems = this._items.reduce((acc, it) => acc + (Number(it.quantity) || 0), 0);

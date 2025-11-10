@@ -1,10 +1,11 @@
 class ActivityTracker {
 
     constructor() {
-        // constants
+        // Constants
         this.KEY = 'activity-tracker-data';
-        this.SESSION_LIMIT = 60 * 60 * 1000; // 1 hr
+        this.SESSION_LIMIT = 60 * 60 * 1000; // 1 hour limit per session
 
+        // Setup
         this._startSession();
         this._displayWidget();
         this._recordPageView();
@@ -14,83 +15,94 @@ class ActivityTracker {
 
     // ---------------------- SESSION SETUP ----------------------
     _startSession() {
-        const saved = localStorage.getItem(this.KEY);
+        const savedData = localStorage.getItem(this.KEY);
         const now = Date.now();
 
-        if (saved) {
+        if (savedData) {
             try {
-                const data = JSON.parse(saved);
-                const lastEvent = data.events.length
-                    ? Math.max(...data.events.map(e => e.time))
-                    : data.startedAt;
+                const sessionData = JSON.parse(savedData);
+                const lastEventTime = sessionData.events.length
+                    ? sessionData.events.reduce((max, e) => e.time > max ? e.time : max, sessionData.startedAt)
+                    : sessionData.startedAt;
 
-                // reuse session if still active
-                if (now - lastEvent < this.SESSION_LIMIT) {
-                    this.session = data;
+                // Reuse the session if it’s still active
+                if (now - lastEventTime < this.SESSION_LIMIT) {
+                    this.session = sessionData;
                     return;
                 }
+
             } catch (err) {
-                console.warn('Could not load existing session', err);
+                console.warn('Error reading saved session:', err);
             }
         }
 
-        // create new session
+        // Start a new session
         this.session = {
             sessionId: this._createSessionId(),
             startedAt: now,
             events: []
         };
+
         this._persistSession();
     }
 
     _createSessionId() {
-        const t = Date.now();
-        const r = Math.random().toString(36).substring(2, 7);
-        return `session_${t}_${r}`;
+        const timestamp = Date.now();
+        const randomStr = Math.random().toString(36).substring(2, 8);
+        return `session_${timestamp}_${randomStr}`;
     }
 
     _persistSession() {
-        localStorage.setItem(this.KEY, JSON.stringify(this.session));
+        try {
+            localStorage.setItem(this.KEY, JSON.stringify(this.session));
+        } catch (e) {
+            console.error('Failed to save session', e);
+        }
     }
 
     // ---------------------- TIME HELPERS ----------------------
     _getFormattedTime(ts) {
         const d = new Date(ts);
-        return [
-            String(d.getHours()).padStart(2, '0'),
-            String(d.getMinutes()).padStart(2, '0'),
-            String(d.getSeconds()).padStart(2, '0')
-        ].join(':');
+        const hh = String(d.getHours()).padStart(2, '0');
+        const mm = String(d.getMinutes()).padStart(2, '0');
+        const ss = String(d.getSeconds()).padStart(2, '0');
+        return `${hh}:${mm}:${ss}`;
     }
 
     _sessionMinutes() {
-        return Math.floor((Date.now() - this.session.startedAt) / 60000);
+        const elapsed = Date.now() - this.session.startedAt;
+        return Math.floor(elapsed / 60000);
     }
 
     // ---------------------- EVENT LOGGING ----------------------
     _recordPageView() {
-        const page = window.location.pathname.split('/').pop() || 'index.html';
-        this._logEvent('pageview', `Visited ${page}`, page);
+        const pageName = window.location.pathname.split('/').pop() || 'index.html';
+        this._logEvent('pageview', `Visited ${pageName}`, pageName);
     }
 
     _logEvent(type, details, page = null) {
-        const entry = {
+        const newEvent = {
             type,
             details,
             time: Date.now()
         };
-        if (page) entry.page = page;
-        this.session.events.push(entry);
+
+        if (page) newEvent.page = page;
+
+        this.session.events.push(newEvent);
         this._persistSession();
         this._updateUI();
     }
 
     _attachListeners() {
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('btn-primary')) {
+            const el = e.target;
+
+            if (el.classList.contains('btn-primary')) {
                 this._logEvent('interaction', 'Clicked link: Shop Now');
             }
-            if (e.target.classList.contains('activity-tracker-button')) {
+
+            if (el.classList.contains('activity-tracker-button')) {
                 this._expandCollapseTimeline();
             }
         }, true);
@@ -102,7 +114,7 @@ class ActivityTracker {
 
     // ---------------------- WIDGET UI ----------------------
     _displayWidget() {
-        const html = `
+        const widgetHTML = `
             <div class="activity-tracker-widget">
                 <button class="activity-tracker-button" title="View activity">🕒</button>
                 <aside class="activity-tracker-timeline">
@@ -112,7 +124,8 @@ class ActivityTracker {
                 </aside>
             </div>
         `;
-        document.body.insertAdjacentHTML('beforeend', html);
+
+        document.body.insertAdjacentHTML('beforeend', widgetHTML);
     }
 
     _displayHeader() {
@@ -141,31 +154,32 @@ class ActivityTracker {
     }
 
     _calculateStats() {
-        const events = this.session.events;
+        const ev = this.session.events;
         return {
             duration: this._sessionMinutes(),
-            pages: events.filter(e => e.type === 'pageview').length,
-            clicks: events.filter(e => e.type === 'interaction' && e.details.includes('Click')).length,
-            forms: events.filter(e => e.type === 'interaction' && e.details.includes('Form')).length
+            pages: ev.filter(e => e.type === 'pageview').length,
+            clicks: ev.filter(e => e.type === 'interaction' && e.details.includes('Click')).length,
+            forms: ev.filter(e => e.type === 'interaction' && e.details.includes('Form')).length
         };
     }
 
     _displayTimeline() {
-        const items = this.session.events.map(ev => this._formatTimelineEvent(ev)).join('');
+        const eventsMarkup = this.session.events.map(e => this._formatTimelineEvent(e)).join('');
         return `
             <div class="timeline-content">
                 <div class="timeline-wrapper">
-                    ${items}
+                    ${eventsMarkup}
                 </div>
             </div>
         `;
     }
 
     _formatTimelineEvent(ev) {
-        const cls = ev.type === 'pageview' ? 'pageview' : 'interaction';
+        const eventClass = ev.type === 'pageview' ? 'pageview' : 'interaction';
         const label = ev.type === 'pageview' ? 'Page View' : 'Interaction';
+
         return `
-            <div class="timeline-item ${cls}">
+            <div class="timeline-item ${eventClass}">
                 <div class="time">${this._getFormattedTime(ev.time)}</div>
                 <div class="event-title">${label}</div>
                 <div class="event-details">${ev.details}</div>
@@ -174,32 +188,42 @@ class ActivityTracker {
     }
 
     _expandCollapseTimeline() {
-        const tl = document.querySelector('.activity-tracker-timeline');
-        if (tl) tl.classList.toggle('expanded');
+        const timeline = document.querySelector('.activity-tracker-timeline');
+        if (timeline) {
+            timeline.classList.toggle('expanded');
+        }
     }
 
     _updateUI() {
-        const stats = document.querySelector('.session-stats');
-        const wrap = document.querySelector('.timeline-wrapper');
-        if (stats) stats.innerHTML = this._displayStats().replace(/<\/?section.*?>/g, '');
-        if (wrap) wrap.innerHTML = this.session.events.map(e => this._formatTimelineEvent(e)).join('');
+        const statsEl = document.querySelector('.session-stats');
+        const timelineWrap = document.querySelector('.timeline-wrapper');
+
+        if (statsEl) {
+            statsEl.innerHTML = this._displayStats().replace(/<\/?section.*?>/g, '');
+        }
+
+        if (timelineWrap) {
+            timelineWrap.innerHTML = this.session.events.map(e => this._formatTimelineEvent(e)).join('');
+        }
     }
 
     // ---------------------- DURATION TIMER ----------------------
     _updateSessionDuration() {
         setInterval(() => {
-            const el = document.querySelector('.stat-value');
-            if (el) el.textContent = `${this._sessionMinutes()} min`;
+            const durationEl = document.querySelector('.stat-value');
+            if (durationEl) {
+                durationEl.textContent = `${this._sessionMinutes()} min`;
+            }
         }, 1000);
     }
 }
 
-// Node/Browser compatibility
+// Node/Browser check
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ActivityTracker;
 } else {
     window.ActivityTracker = ActivityTracker;
 }
 
-// Initialize when ready
+// Auto-start when page loads
 document.addEventListener('DOMContentLoaded', () => new ActivityTracker());

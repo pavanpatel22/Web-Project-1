@@ -1,9 +1,9 @@
 class ShoppingCart {
     constructor() {
-        // internal storage for cart items (array of {id, name, price, image, quantity, ...})
+        
         this._items = [];
 
-        // load existing cart data from localStorage
+        
         const stored = localStorage.getItem('cart');
         if (stored) {
             try {
@@ -14,11 +14,11 @@ class ShoppingCart {
             }
         }
 
-        // sync the cart badge or counter
+        
         this.updateCartCount();
     }
 
-    // Add product to cart (if exists, increment quantity)
+    
     addToCart(product) {
         const existing = this._items.find(it => it.id === product.id);
 
@@ -33,7 +33,7 @@ class ShoppingCart {
         this.updateCartCount();
     }
 
-    // Remove product completely by ID
+    
     removeFromCart(productId) {
         const before = this._items.length;
         this._items = this._items.filter(item => item.id !== productId);
@@ -44,7 +44,7 @@ class ShoppingCart {
         }
     }
 
-    // Update quantity of a specific product
+   
     updateQuantity(productId, quantity) {
         const newQty = parseInt(quantity, 10) || 0;
         const target = this._items.find(item => item.id === productId);
@@ -52,7 +52,7 @@ class ShoppingCart {
         if (!target) return;
 
         if (newQty <= 0) {
-            // remove item if zero or less
+        
             this._items = this._items.filter(item => item.id !== productId);
         } else {
             target.quantity = newQty;
@@ -62,7 +62,7 @@ class ShoppingCart {
         this.updateCartCount();
     }
 
-    // Calculate the total cost of all cart items
+  
     getTotal() {
         return this._items.reduce((sum, item) => {
             const price = parseFloat(item.price) || 0;
@@ -71,12 +71,12 @@ class ShoppingCart {
         }, 0);
     }
 
-    // Return array of cart items
+  
     getCart() {
         return this._items;
     }
 
-    // Clear entire cart
+  
     clearCart() {
         if (!this._items.length) return;
         this._items = [];
@@ -84,11 +84,7 @@ class ShoppingCart {
         this.updateCartCount();
     }
 
-    // ---------------------
-    // Internal helpers
-    // ---------------------
 
-    // Save cart to localStorage
     _persist() {
         try {
             localStorage.setItem('cart', JSON.stringify(this._items));
@@ -97,7 +93,7 @@ class ShoppingCart {
         }
     }
 
-    // Update visible cart counter (.bag_count)
+  
     updateCartCount() {
         const counter = document.querySelector('.bag_count');
         if (!counter) return;
@@ -111,5 +107,4 @@ class ShoppingCart {
     }
 }
 
-// single instance for global use
 const cart = new ShoppingCart();
